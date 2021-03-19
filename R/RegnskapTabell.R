@@ -7,7 +7,9 @@
 #' @param anslag_ar  Gjeldende måned for anslaget
 #' @return Tabell med årlige regnskapstall, og per mnd.
 #' @examples
-#' RegnskapTabell$new( df, g_gjeldende = 10300, anslag_ar = 2021, anslag_mnd = 02, post = "post70")
+#' Dette er en test. Kommer dette i dokumentasjonen?
+
+
 
 RegnskapTabell <- R6::R6Class( "Regnskapstabell",
 
