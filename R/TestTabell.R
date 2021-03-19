@@ -1,0 +1,6 @@
+
+
+lagTabell <- function( ) {
+
+    print("hei")
+}
