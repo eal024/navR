@@ -1,13 +1,28 @@
-#' @title Regnskapstabell
-#' @name Regnskapstabell
-#' @alias Regnskapstabell
-#' @param dfRegnskap data.frame med regnskapstall per mnd Tre rader: Nominelle regnskapstall, dato "YYYY-MM-DD" og mnd prisjusterer.
+#' R6 Class Regnskapstabell
+#'
+#' @description
+#' Tabellen viser nominelle og prisjustert utgifter. Per ar og per mnd i innevaerende ar.
+#'
+#' @details
+#' Tabellen ma "lages" med metode "lagTabell".
+#'
+#' @param dfRegnskap data.frame med regnskapstall per mnd. input data skal ha tre rader  dato ("YYYY-MM-DD"), nominelle regnskapstall per mnd og prisjusterer per mnd.
 #' @param g_gjeldende  Forutsatt prisjusterer.
-#' @param anslag_ar  Gjeldende år for anslaget
-#' @param anslag_ar  Gjeldende måned for anslaget
-#' @return Tabell med årlige regnskapstall, og per mnd.
+#' @param anslag_ar  Gjeldende ar for anslaget
+#' @param anslag_mnd_periode  Gjeldende maned for anslaget
+#' @return Tabell med arlige summerte regnskapstall
+
 #' @examples
-#' Dette er en test. Kommer dette i dokumentasjonen?
+#' Opprett forst class regnskapstabell:RegnskapTabell$new(
+#'    dfRegnskap = navR::regnskap,
+#'    g_gjeldende = 104817,
+#'    anslag_ar = 2021,
+#'    anslag_mnd_periode = 2,
+#'    post = "post70"
+#'    )
+#'
+#' Dertter lag tabell med metode:
+#' RegnskapTabell$lagRegnskapTabell()
 
 
 
@@ -15,7 +30,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
 
                                public = list(
 
-                                   initialize = function( dfRegnskap, g_gjeldende, anslag_ar, anslag_mnd_periode, post = "post"){
+                                   initialize = function( dfRegnskap, g_gjeldende, anslag_ar, anslag_mnd_periode, post = "post70"){
                                        #
                                        private$dfRegnskap  <-     dfRegnskap
                                        private$g_gjeldende <-     g_gjeldende
@@ -28,7 +43,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                    # Lag regnskapstabell
                                    lagRegnskapTabell = function(  ) {
 
-                                       # Må passe med resternede del
+                                       # Ma passe med resterende del
                                        prisjusterer <- private$g_gjeldende
 
                                        # Regnskaptabell
@@ -63,7 +78,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                            dplyr::select( dato, regnskap_nominell = regnskap, g) %>%
                                            dplyr::mutate( kategori = "post70") %>%
                                            dplyr::filter(  lubridate::year(dato) <= (private$anslag_ar),  lubridate::year(dato) > (private$anslag_ar-3) , lubridate::month(dato) <= private$anslag_mnd_periode ) %>%
-                                           dplyr::group_by( ar = year(dato), kategori ) %>%
+                                           dplyr::group_by( ar = lubridate::year(dato), kategori ) %>%
                                            dplyr::summarise( regnskap = sum( regnskap_nominell,na.rm = T),
                                                              g_snitt =   mean(g, na.rm = T),
                                                              .groups = "drop") %>%
@@ -103,7 +118,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                            dplyr::select( ar, kategori, regnskap, endring_regnskap, regnskap_vekst, regnskap_fast, endring_regnskap_f, regnskap_fast_vekst)
 
                                        private$tabell_regnskap_historikk <- dplyr::bind_rows(tabell_regnskap_del1 %>% mutate( ar = as.character(ar)), tabell_regnskap_del2_2) %>%
-                                           arrange( kategori) %>% ungroup()
+                                           dplyr::arrange( kategori) %>% dplyr::ungroup()
                                        #
 
                                        private$ifjor_regnskap = private$tabell_regnskap_historikk %>% dplyr::filter( ar == as.character(private$anslag_ar-1) ) %>% dplyr::pull(regnskap)/10^6
@@ -125,13 +140,12 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                private = list(
                                    ifjor_regnskap = NULL,
                                    dfRegnskap = NULL,
-                                   g_gjeldende = NULL,
                                    anslag_ar = NULL,
+                                   g_gjeldende = NULL,
                                    anslag_mnd_periode = NULL,
                                    tabell_regnskap_historikk = NULL,
                                    post = NULL
                                )
-
 
 )
 #
