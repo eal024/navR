@@ -17,6 +17,11 @@ Budsjett <- R6::R6Class( "Budsjett",
                                    private$volumvekst <- volumvekst
                                    private$vekst_ytelse <- vekst_ytelse
 
+                                   # Historiske anslag
+                                   private$historiskeAnslag <- list()
+
+
+
                                    # Regnskapstabell
                                    private$regnskapTabell <- RegnskapTabell$new(
                                        dfRegnskap = private$dfRegnskap,
@@ -71,18 +76,6 @@ Budsjett <- R6::R6Class( "Budsjett",
                                },
 
 
-                               # Legg til tidligere anslag
-                               leggTilHistoriskAnslag = function( navn, ar, regnskap_ifjor,  prisvekst, volumvekst,tiltak) {
-
-                                   # Historisk anslag 1
-                                   private$historiskAnslag1 = Anslag$new(
-                                       name = navn,
-                                       ar = ar,
-                                       regnskap_ifjor = regnskap_ifjor,
-                                       prisvekst = prisvekst,
-                                       volumvekst = volumvekst,
-                                       tiltak = tiltak)
-                               },
 
                                lagTabellMndUtviklingRegnskap = function(   ) {
 
@@ -118,10 +111,12 @@ Budsjett <- R6::R6Class( "Budsjett",
                                },
 
 
+
+
                                # # Gi anslagene i liste ----------------------------------------------
                                giAnslag = function( ) { return( list(
                                    # Nytt anslag
-                                   nytt_anslag = list( private$nytt_anslag, private$nytt_anslag$dfAnslag()  )
+                                   nytt_anslag = list( private$nytt_anslag, private$nytt_anslag$giDfAnslag( )  )
                                )
                                ) },
 
@@ -135,7 +130,42 @@ Budsjett <- R6::R6Class( "Budsjett",
 
                                giM = function( ) { return(private$MOTTAKERE_ARET_FOR)},
 
-                               # Print
+
+# Historiske anslag -------------------------------------------------------
+
+                                # # Legg til tidligere anslag
+                                # leggTilHistoriskAnslag = function( navn, ar, regnskap_ifjor,  prisvekst, volumvekst,tiltak) {
+                                #
+                                #     # Historisk anslag 1
+                                #     private$historiskAnslag1 = Anslag$new(
+                                #         name = navn,
+                                #         ar = ar,
+                                #         regnskap_ifjor = regnskap_ifjor,
+                                #         prisvekst = prisvekst,
+                                #         volumvekst = volumvekst,
+                                #         tiltak = tiltak)
+                                # },
+                                #
+                                # Legg til historik anslag
+                                leggTilHistoriskAnslag = function( anslag, navnAnslag = NULL) {
+
+                                    # Sjekk at anslaget legges inn som anslag :: class == class Anslag
+                                    anslagNavn <- ifelse( is.null(navnAnslag), anslag$giNavn(), navnAnslag )
+
+                                    # legg til og gi navn
+                                    private$historiskeAnslag <- base::append( private$historiskeAnslag, anslag);
+                                    private$historiskeAnslag <- purrr::set_names( private$historiskeAnslag , nm = anslagNavn)
+
+                                    },
+
+                                ## Print ut historiske anslag
+                                giHistoriskeAnslag = function(  ) { private$historiskeAnslag },
+
+
+
+
+
+# Print -------------------------------------------------------------------
                                print = function(...){
                                    cat("Anslaget er:", private$name," For ar: ", private$ar, "\n");
                                    # cat("Regnskapet i fjor viser:", private$dfRegnskap[private$dfRegnskap$ar == (private$ar-1)], "\n")
@@ -160,8 +190,12 @@ Budsjett <- R6::R6Class( "Budsjett",
                                           vekst_ytelse = NULL,
                                           tiltak_pst = NULL,
                                           volumvekst = NULL,
-                                          historiskAnslag1 = NULL
+                                          historiskAnslag1 = NULL,
                                           # dfForutseting = NULL,
                                           #G = NA
+                                          ## Historiske anslag
+                                          historiskeAnslag = NULL
+
+
                            )
 )
