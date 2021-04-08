@@ -4,11 +4,13 @@ Budsjett <- R6::R6Class( "Budsjett",
 
                            public = list(
                                #library(tidyverse),
-                               initialize = function( name, periode, dfRegnskap, g_gjeldende, dfMottakere, PRIS_VEKST, tiltak_pst, volumvekst, vekst_ytelse ) {
+                               initialize = function( name, name_nytt_anslag, periode, dfRegnskap, g_gjeldende, dfMottakere, PRIS_VEKST, tiltak_pst, volumvekst, vekst_ytelse ) {
 
-                                   private$name <- name
-                                   private$ar <- str_sub(periode, start =1, end = 4) %>% as.integer()
-                                   private$mnd <- ifelse( nchar(periode) < 5, str_sub(periode, start = 6, end = 6), str_sub(periode, start = 5, end = 6)) %>% as.integer()
+                               ## Private variabler deklareres:
+                                   private$name <- name;
+                                   private$name_nytt_anslag <- name_nytt_anslag
+                                   private$ar <- stringr::str_sub( as.character(periode), start = 1, end = 4) %>% as.integer()
+                                   private$mnd <- ifelse( nchar(periode) < 5, stringr::str_sub(periode, start = 6, end = 6), str_sub(periode, start = 5, end = 6)) %>% as.integer()
                                    private$dfRegnskap <- dfRegnskap
                                    private$g_gjeldende <- g_gjeldende
                                    private$dfMottakere <- dfMottakere
@@ -17,47 +19,66 @@ Budsjett <- R6::R6Class( "Budsjett",
                                    private$volumvekst <- volumvekst
                                    private$vekst_ytelse <- vekst_ytelse
 
-                                   # Historiske anslag
+                                ## Samling av anslagene i lister:
                                    private$historiskeAnslag <- list()
+                                   private$nyeAnslag <-  list()
 
 
 
-                                   # Regnskapstabell
+                               #     # Regnskapstabell
                                    private$regnskapTabell <- RegnskapTabell$new(
                                        dfRegnskap = private$dfRegnskap,
                                        g_gjeldende = private$g_gjeldende,
                                        anslag_ar = private$ar,
                                        anslag_mnd_periode = private$mnd)$lagRegnskapTabell()
 
-                                   # Regnskapet året før
+                               #     # Regnskapet året før
                                    private$REGNSKAP_ARET_FOR <- private$regnskapTabell$regnskap[private$regnskapTabell$ar == as.character(private$ar-1)]
-
-
-
-                                   # Mottakertabell
+                               #
+                               #
+                               # #     # Mottakertabell
                                    private$mottakerTabell <- Mottakere$new(
                                        name = private$name,
                                        dfMottakere = private$dfMottakere,
                                        ANSLAG_AR = private$ar,
                                        ANSLAG_MND_PERIODE = private$mnd)$lagTabell( )
-
-                                   # mottakere året før
+                               # #
+                               # #     # mottakere året før
                                    private$MOTTAKERE_ARET_FOR <- private$mottakerTabell$gjennomsnitt[private$mottakerTabell$ar == as.character(private$ar-1)]
-
-                                   # Anslaget nytt
+                               # #
+                               # #     # Anslaget nytt
                                    private$nytt_anslag <- Anslag$new(
-                                       name = private$name,
+                                       # Navn på anslag fra navn_nytt_anslag
+                                       name = private$name_nytt_anslag,
                                        ar = private$ar,
                                        regnskap_ifjor = private$REGNSKAP_ARET_FOR,
                                        vekst_ytelse = private$vekst_ytelse,
                                        prisvekst = private$PRIS_VEKST,
                                        volumvekst = private$volumvekst,
-                                       tiltak = private$tiltak_pst)
+                                       tiltak = private$tiltak_pst
+                                       )
 
-                                   #)
+                                   private$nytt_anslag$dfAnslag()
 
+                                   private$nytt_anslag <- private$nytt_anslag
+                               #
+                               # # # Nytt anslag blir lagt til listen "nyeAnslag"
+
+                                   private$nyeAnslag[[1]] <- private$nytt_anslag
+
+                                   #private$nyeAnslag <- set_names(private$nyeAnslag, purrr::map_chr(private$nyeAnslag, ~.x$giAnslagNavn() %>% as.character() ) )
+
+
+
+                               # #
+                               #     # Nye anslag
+                               # #     # Nytt anslag dette år må alltid komme først. #private$nytt_anslag$giAnslagNavn() = private$nytt_anslag
+                                   #private$nyeAnslag <- return(private$nytt_anslag$giAnslagNavn() )
+                               # #
+                               # #
+                               #
+                               #
                                },
-
 
                                # Gi regnskapstabell
                                lagRegnskapTabell = function(  ){
@@ -74,9 +95,10 @@ Budsjett <- R6::R6Class( "Budsjett",
                                giRegnskapstallIfjor = function( ) {
                                    return(private$REGNSKAP_ARET_FOR)
                                },
+                               #
+                               #
 
-
-
+                               ## Månedsutvikling regnskapet
                                lagTabellMndUtviklingRegnskap = function(   ) {
 
                                    # If regnskapTabell or mottaker
@@ -93,6 +115,8 @@ Budsjett <- R6::R6Class( "Budsjett",
                                    return( utvikling$tabellMndUtvikling())
 
                                },
+
+                               ## Utvikling mottakere:
                                lagTabellMndUtviklingMottakere = function(   ) {
 
                                    # Slå sammen med lagTabell i liste deretter returner en fra listen
@@ -106,60 +130,92 @@ Budsjett <- R6::R6Class( "Budsjett",
                                                                   REGNSKAP_ARET_FOR = private$REGNSKAP_ARET_FOR,
                                                                   MOTTAKERE_ARET_FOR = private$MOTTAKERE_ARET_FOR )
 
-                                   return( utvikling$tabellMndUtvikling())
+                                   return( utvikling$tabellMndUtvikling() )
 
                                },
 
 
 
 
-                               # # Gi anslagene i liste ----------------------------------------------
-                               giAnslag = function( ) { return( list(
+# # Nye anslag: Retur av liste og retur av df ----------------------------------------------
+
+                            lagNyttAnslagNesteAr = function(  name,
+                                                           ar = NULL,
+                                                           regnskap_ifjor = NULL,
+                                                           vekst_ytelse = NULL,
+                                                           prisvekst = NULL,
+                                                           volumvekst = NULL,
+                                                           tiltak = NULL,
+                                                           underregulering = NULL ) {
+
+
+                                                                                      anslag <- Anslag$new(  name = name,
+                                                                                                   ar = ar,
+                                                                                                   regnskap_ifjor = regnskap_ifjor,
+                                                                                                   prisvekst = prisvekst,
+                                                                                                   volumvekst = volumvekst,
+                                                                                                   tiltak = tiltak,
+                                                                                                   underregulering = underregulering)
+
+                                                                                      anslag
+
+
+
+                                },
+
+                            leggTilNyttAnslag = function( anslag, rekkefolge ) {
+
+                            # Denne må forbedres
+                                private$nyeAnslag[[rekkefolge]] <- anslag
+                            #
+                                #private$nyeAnslag <- set_names(private$nyeAnslag, purrr::map_chr(private$nyeAnslag, ~.x$giAnslagNavn() %>% as.character()) )
+
+                                private$nyeAnslag
+
+                            },
+
+
+                            ## Retur av liste
+                               giAnslag = function( ) {
                                    # Nytt anslag
-                                   nytt_anslag = list( private$nytt_anslag, private$nytt_anslag$giDfAnslag( )  )
-                               )
-                               ) },
-
-                               # Gi info om anslag
-                               giInfoOmAnslag = function( ) {return(private$nytt_anslag)},
+                                   private$nyeAnslag
 
 
-                               # Skriv ut alt
-                               skrivUtTabeller = function( ) { list(nytt_anslag = private$nytt_anslag$dfAnslag(), hist_regnskap = private$regnskapTabell  ) %>% writexl::write_xlsx( str_c(today()," ",paste0(private$name) ," tabller.xlsx" )) },
 
 
-                               giM = function( ) { return(private$MOTTAKERE_ARET_FOR)},
+
+                                },
+                               #
+                               # # Gi info om anslag
+                               # giInfoOmAnslag = function( ) {return(private$nytt_anslag)},
+                               #
+                               #
+                               # # Skriv ut alt
+                               # skrivUtTabeller = function( ) { list(nytt_anslag = private$nytt_anslag$dfAnslag(), hist_regnskap = private$regnskapTabell  ) %>% writexl::write_xlsx( str_c(today()," ",paste0(private$name) ," tabller.xlsx" )) },
+                               #
+                               #
+                               # giM = function( ) { return(private$MOTTAKERE_ARET_FOR)},
 
 
 # Historiske anslag -------------------------------------------------------
 
                                 # # Legg til tidligere anslag
-                                # leggTilHistoriskAnslag = function( navn, ar, regnskap_ifjor,  prisvekst, volumvekst,tiltak) {
+                                leggTilHistoriskAnslag = function( anslag, rekkefolge) {
+
+                                    private$historiskeAnslag[[rekkefolge]] <- anslag
+
+
+
+                                },
                                 #
-                                #     # Historisk anslag 1
-                                #     private$historiskAnslag1 = Anslag$new(
-                                #         name = navn,
-                                #         ar = ar,
-                                #         regnskap_ifjor = regnskap_ifjor,
-                                #         prisvekst = prisvekst,
-                                #         volumvekst = volumvekst,
-                                #         tiltak = tiltak)
-                                # },
-                                #
-                                # Legg til historik anslag
-                                leggTilHistoriskAnslag = function( anslag, navnAnslag = NULL) {
 
-                                    # Sjekk at anslaget legges inn som anslag :: class == class Anslag
-                                    anslagNavn <- ifelse( is.null(navnAnslag), anslag$giNavn(), navnAnslag )
-
-                                    # legg til og gi navn
-                                    private$historiskeAnslag <- base::append( private$historiskeAnslag, anslag);
-                                    private$historiskeAnslag <- purrr::set_names( private$historiskeAnslag , nm = anslagNavn)
-
-                                    },
-
-                                ## Print ut historiske anslag
+                                # ## Print ut historiske anslag
                                 giHistoriskeAnslag = function(  ) { private$historiskeAnslag },
+
+
+# Sammenlikne nytt med historiske anslag ----------------------------------
+
+
 
 
 
@@ -167,34 +223,35 @@ Budsjett <- R6::R6Class( "Budsjett",
 
 # Print -------------------------------------------------------------------
                                print = function(...){
-                                   cat("Anslaget er:", private$name," For ar: ", private$ar, "\n");
-                                   # cat("Regnskapet i fjor viser:", private$dfRegnskap[private$dfRegnskap$ar == (private$ar-1)], "\n")
-                                   # cat("G er ", private$G, "\n")
-                               }
+                                 cat("hei", "\n")
+                                 cat("Anslaget er:", private$name," For ar: ", private$ar, "\n");
+                               #     cat("Regnskapet i fjor viser:", private$dfRegnskap[private$dfRegnskap$ar == (private$ar-1)], "\n")
+                               #     # cat("G er ", private$G, "\n")
+                           }
                            ),
                            # Private
                            private = list(name = NULL,
-                                          ar= NULL ,
+                                          name_nytt_anslag = NULL,
+                                          ar = NULL,
                                           mnd = NULL,
                                           dfRegnskap = NULL,
-                                          test = NULL,
                                           g_gjeldende = NULL,
                                           dfMottakere = NULL,
                                           PRIS_VEKST = NULL,
+                                          vekst_ytelse = NULL,
+                                          tiltak_pst = NULL,
+                                          volumvekst = NULL,
+
                                           mottakerTabell = NULL,
                                           regnskapTabell = NULL,
                                           REGNSKAP_ARET_FOR = NULL,
                                           MOTTAKERE_ARET_FOR = NULL,
-                                          # Nytt anslag
+
+                                          # # Anslag
                                           nytt_anslag = NULL,
-                                          vekst_ytelse = NULL,
-                                          tiltak_pst = NULL,
-                                          volumvekst = NULL,
-                                          historiskAnslag1 = NULL,
-                                          # dfForutseting = NULL,
-                                          #G = NA
-                                          ## Historiske anslag
-                                          historiskeAnslag = NULL
+                                          nytt_anslag_neste_ar = NULL,
+                                          historiskeAnslag = NULL,
+                                          nyeAnslag = NULL
 
 
                            )

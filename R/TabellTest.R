@@ -1,32 +1,6 @@
-#' R6 Class Regnskapstabell
-#'
-#' @description
-#' Tabellen viser nominelle og prisjustert utgifter. Per ar og per mnd i innevaerende ar.
-#'
-#' @details
-#' Tabellen ma "lages" med metode "lagTabell".
-#'
-#' @param dfRegnskap data.frame med regnskapstall per mnd. input data skal ha tre rader  dato ("YYYY-MM-DD"), nominelle regnskapstall per mnd og prisjusterer per mnd.
-#' @param g_gjeldende  Forutsatt prisjusterer.
-#' @param anslag_ar  Gjeldende ar for anslaget
-#' @param anslag_mnd_periode  Gjeldende maned for anslaget
-#' @return Tabell med arlige summerte regnskapstall
-
-#' @examples
-#' Opprett forst class regnskapstabell:RegnskapTabell$new(
-#'    dfRegnskap = navR::regnskap,
-#'    g_gjeldende = 104817,
-#'    anslag_ar = 2021,
-#'    anslag_mnd_periode = 2,
-#'    post = "post70"
-#'    )
-#'
-#' Dertter lag tabell med metode:
-#' RegnskapTabell$lagRegnskapTabell()
 
 
-
-RegnskapTabell <- R6::R6Class( "Regnskapstabell",
+TabellTest <- R6::R6Class( "Regnskapstabell",
 
                                public = list(
 
@@ -47,7 +21,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                        prisjusterer <- private$g_gjeldende
 
                                        # Regnskaptabell
-                                       tabell_regnskap_del1 <-
+                                       tabell_regnskap_del0 <-
                                            private$dfRegnskap %>%
                                            dplyr::select( dato, regnskap_nominell = regnskap, g)  %>%
                                            # # Denne må justeres
@@ -58,7 +32,12 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                                              .groups = "drop") %>%
                                            dplyr::mutate( regnskap_fast = case_when(
                                                stringr::str_detect(kategori, "70") ~ ((regnskap*prisjusterer)/g_snitt))
-                                           ) %>%
+                                           )
+
+                                       private$tabell_regnskap_del0 <- tabell_regnskap_del0
+
+                                       tabell_regnskap_del1 <-
+                                           tabell_regnskap_del0 %>%
                                            dplyr::filter( between(ar, (private$anslag_ar-7 ),( ifelse(private$anslag_mnd_periode == 12,(private$anslag_ar),(private$anslag_ar -1) ) ) ))  %>%
                                            dplyr::arrange( kategori) %>%
                                            dplyr::select(-c(g_snitt))%>%
@@ -129,6 +108,35 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
 
                                    },
 
+                                   tabellRegnskapDel3 = function( anslag1, anslag2 ){
+
+                                       df <- tibble(
+
+                                           kategori = c("Anslag", "Anslag") ,
+                                           ar =       c(anslag1$giAr(),anslag2$giAr() ),
+                                           regnskap = c( anslag1$giSumAnslag(),anslag2$giSumAnslag()),
+                                           g_snitt = c( private$g_gjeldende, private$g_gjeldende*anslag2$giPrisvekst() ),
+                                           regnskap_fast = c( anslag1$giSumAnslag() ,anslag2$giSumAnslag()/anslag2$giPrisvekst() )
+                                            )
+
+                                       df2 <- bind_rows( private$tabell_regnskap_del0 %>% dplyr::filter( ar < anslag1$giAr() ), df )
+
+                                       df3 <- df2 %>%
+                                           dplyr::arrange( ar) %>%
+                                           dplyr::mutate( endring_regnskap = regnskap-lag(regnskap),
+                                                          endring_regnskap_f = regnskap_fast -lag(regnskap_fast),
+                                                          regnskap_vekst = regnskap/lag(regnskap)-1,
+                                                          regnskap_fast_vekst = regnskap_fast/lag(regnskap_fast)-1) %>%
+                                           tidyr::drop_na() %>%
+                                           dplyr::select( ar, kategori, regnskap, endring_regnskap, regnskap_vekst, regnskap_fast, endring_regnskap_f, regnskap_fast_vekst) %>%
+                                           dplyr::filter( dplyr::between(ar, (private$anslag_ar-1), (private$anslag_ar+1) ) )
+
+
+                                       return( df3 )
+
+                                   },
+
+
 
 
                                    # Print
@@ -145,7 +153,8 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                    g_gjeldende = NULL,
                                    anslag_mnd_periode = NULL,
                                    tabell_regnskap_historikk = NULL,
-                                   post = NULL
+                                   post = NULL,
+                                   tabell_regnskap_del0 = NULL
                                )
 
 )
