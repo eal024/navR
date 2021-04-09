@@ -13,7 +13,7 @@
 #' @return Tabell med arlige summerte regnskapstall
 
 #' @examples
-#' Opprett forst class regnskapstabell:RegnskapTabell$new(
+#' Opprett forst class obj_tabell <- regnskapstabell:RegnskapTabell$new(
 #'    dfRegnskap = navR::regnskap,
 #'    g_gjeldende = 104817,
 #'    anslag_ar = 2021,
@@ -22,7 +22,9 @@
 #'    )
 #'
 #' Dertter lag tabell med metode:
-#' RegnskapTabell$lagRegnskapTabell()
+#' obj_tabell$lagRegnskapTabell()
+#' Når anslaget er laget legges anslagene til med metoden lagRegnskapTabell2( anslag1, anslag2 ),
+#' eks: obj_tabell$lagRegnskapTabell2(anslag2020, anslag2021)
 
 
 
@@ -47,7 +49,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                        prisjusterer <- private$g_gjeldende
 
                                        # Regnskaptabell
-                                       tabell_regnskap_del1 <-
+                                       tabell_regnskap_del0 <-
                                            private$dfRegnskap %>%
                                            dplyr::select( dato, regnskap_nominell = regnskap, g)  %>%
                                            # # Denne må justeres
@@ -58,7 +60,12 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                                              .groups = "drop") %>%
                                            dplyr::mutate( regnskap_fast = case_when(
                                                stringr::str_detect(kategori, "70") ~ ((regnskap*prisjusterer)/g_snitt))
-                                           ) %>%
+                                           )
+
+                                       private$tabell_regnskap_del0 <- tabell_regnskap_del0
+
+                                       tabell_regnskap_del1 <-
+                                           tabell_regnskap_del0 %>%
                                            dplyr::filter( between(ar, (private$anslag_ar-7 ),( ifelse(private$anslag_mnd_periode == 12,(private$anslag_ar),(private$anslag_ar -1) ) ) ))  %>%
                                            dplyr::arrange( kategori) %>%
                                            dplyr::select(-c(g_snitt))%>%
@@ -95,7 +102,6 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                                                      ifelse(private$anslag_mnd_periode < 10, str_c("0",(private$anslag_mnd_periode) ),(private$anslag_mnd_periode) ),"-01") ) %>%
                                            dplyr::relocate( contains("snitt"), .after = last_col())
 
-                                       #return(tabell_regnskap_del2)
 
                                        tabell_regnskap_del2_2 <-
                                            tabell_regnskap_del2  %>%
@@ -123,11 +129,62 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
 
                                        private$ifjor_regnskap = private$tabell_regnskap_historikk %>% dplyr::filter( ar == as.character(private$anslag_ar-1) ) %>% dplyr::pull(regnskap)/10^6
 
+
+
                                        return(private$tabell_regnskap_historikk)
 
 
 
+
+
                                    },
+
+
+
+                                   giRegnskaptallAr = function( ar ) {
+
+                                       private$dfRegnskap %>% dplyr::filter( lubridate::year(dato) == ar ) %>% dplyr::summarise( r = sum(regnskap)) %>% pull(r)
+
+
+                                   },
+
+                                   tabellRegnskapDel3 = function( anslag1, anslag2 ){
+
+                                       df <- tibble(
+
+                                           kategori = c("Anslag", "Anslag") ,
+                                           ar =       c(anslag1$giAr(),anslag2$giAr() ),
+                                           regnskap = c( anslag1$giSumAnslag(),anslag2$giSumAnslag()),
+                                           g_snitt = c( private$g_gjeldende, private$g_gjeldende*anslag2$giPrisvekst() ),
+                                           regnskap_fast = c( anslag1$giSumAnslag() ,anslag2$giSumAnslag()/anslag2$giPrisvekst() )
+                                       )
+
+                                       df2 <- bind_rows( private$tabell_regnskap_del0 %>% dplyr::filter( ar < anslag1$giAr() ), df )
+
+                                       df3 <- df2 %>%
+                                           dplyr::arrange( ar) %>%
+                                           dplyr::mutate( endring_regnskap = regnskap-lag(regnskap),
+                                                          endring_regnskap_f = regnskap_fast -lag(regnskap_fast),
+                                                          regnskap_vekst = regnskap/lag(regnskap)-1,
+                                                          regnskap_fast_vekst = regnskap_fast/lag(regnskap_fast)-1) %>%
+                                           tidyr::drop_na() %>%
+                                           dplyr::mutate( ar = as.character(ar) ) %>%
+                                           dplyr::select( ar, kategori, regnskap, endring_regnskap, regnskap_vekst, regnskap_fast, endring_regnskap_f, regnskap_fast_vekst) %>%
+                                           dplyr::filter( dplyr::between(ar, (private$anslag_ar), (private$anslag_ar+1) ) )
+
+
+                                       return( df3 )
+
+                                   },
+
+                                   lagRegnskapTabell2 = function( anslag1, anslag2) {
+
+                                       df  <- self$lagRegnskapTabell()
+                                       df2 <- self$tabellRegnskapDel3(anslag1, anslag2)
+
+                                       dplyr::bind_rows(df, df2)
+                                   },
+
 
 
 
@@ -145,7 +202,8 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                    g_gjeldende = NULL,
                                    anslag_mnd_periode = NULL,
                                    tabell_regnskap_historikk = NULL,
-                                   post = NULL
+                                   post = NULL,
+                                   tabell_regnskap_del0 = NULL
                                )
 
 )
