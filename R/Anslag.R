@@ -169,7 +169,7 @@ Anslag <- R6::R6Class( "Anslag",
                                # Må endre rekkefølgen til korrekt.
                                cat("Anslag: ", private$name,"\n");
                                cat("Forutsetninger:\n");
-                               cat( "  Regnskap", private$ar, ": ",  (private$regnskap_ifjor)/10^6, "mill.kroner\n");
+                               cat( "  Regnskap", (private$ar-1), ": ",  (private$regnskap_ifjor)/10^6, "mill.kroner\n");
                                cat( "  Volumvekst      : ", (private$volumvekst-1)*100, "%\n");
                                cat( "  Vekst ytelse    : ", ((private$vekst_ytelse-1)*100) %>% format( digits = 2), "%\n");
                                cat( "  Prisvekst       : ", ((private$prisvekst-1)*100) %>% format( digits = 2), "%\n");
