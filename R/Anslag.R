@@ -12,7 +12,7 @@ Anslag <- R6::R6Class( "Anslag",
                                                   prisvekst = NULL,
                                                   volumvekst = NULL,
                                                   tiltak = NULL,
-                                                  underregulering = NULL ) {
+                                                  underregulering = NULL) {
 
                                # Private forutsetninger omgjøres til 1 om ingen input.
                                private$name <- name
@@ -162,7 +162,16 @@ Anslag <- R6::R6Class( "Anslag",
 
                            giAr = function( ) { private$ar },
 
+                           giVolumvekst = function(  ) { private$volumvekst },
+
                            giAnslagNavn = function( ) { private$name },
+
+                           giVolum = function( antall_ifjor ) { antall_ifjor*private$volumvekst() },
+
+                           setPris = function( pris , ifjor = F) { private$pris = ifelse( ifjor == F, pris, pris*private$prisvekst)},
+
+                           giPris = function( ) { private$pris},
+
 
                            # Print
                            print = function(...){
@@ -177,6 +186,7 @@ Anslag <- R6::R6Class( "Anslag",
                                cat( "  Tiltak          : ", ((private$tiltak-1)*100) %>% format( digits = 2), "%\n");
                                # Underregulering av satsen
                                cat( "  Nytt anslag   : ", (private$anslag_tall)/10^6, "mill.kroner\n");
+                               if( !is.null(private$pris) ) { cat("\nAnslått pris (G) ", private$pris) } ;
                            }
                        ), # Private
                        private = list(
@@ -187,6 +197,9 @@ Anslag <- R6::R6Class( "Anslag",
                            vekst_ytelse = NULL,
                            # 1+0,0v
                            prisvekst = NULL,
+                           # Ekstra info
+                           pris = NULL,
+
                            # 1+0,0v
                            volumvekst = NULL,
                            # Prosent
