@@ -177,15 +177,22 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
 
                                    },
 
-                                   lagRegnskapTabell2 = function( anslag1, anslag2) {
+                                   lagRegnskapTabell2 = function( anslag1, anslag2, printversjon = FALSE) {
 
                                        df  <- self$lagRegnskapTabell()
                                        df2 <- self$tabellRegnskapDel3(anslag1, anslag2)
+                                       df3 <- dplyr::bind_rows(df, df2)
 
-                                       dplyr::bind_rows(df, df2)
+                                       if( printversjon == FALSE){ df3 }else if(printversjon == TRUE){
+
+                                           #
+                                           df3 %>% dplyr::mutate_at(
+                                                                    vars(regnskap, endring_regnskap, regnskap_faste, endring_regnskap_f),
+                                                                    function(x) x/10^6
+                                                                    )
+                                       }
+
                                    },
-
-
 
 
                                    # Print
