@@ -183,7 +183,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                        df2 <- self$tabellRegnskapDel3(anslag1, anslag2)
                                        df3 <- dplyr::bind_rows(df, df2)
 
-                                       if( printversjon == FALSE){ df3 }else if(printversjon == TRUE){
+                                       if( printversjon == FALSE){df3} else {
 
                                            #
                                            df3 %>% dplyr::mutate_at(

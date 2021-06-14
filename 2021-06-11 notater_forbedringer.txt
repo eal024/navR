@@ -1,0 +1,13 @@
+
+
+Forbedringer til programmet:
+0. budsjett
+    - giregnskapifjor -> må ha en funksjon som henter ut regnskapstall for det gitte året.
+
+1.	Regnskapstabell
+    -	Printversjon av lagRegnskapstabell2( )
+    -
+
+2.	mndTabeller:
+    -	Også nominell
+    -	Leggtil mulighet til å justere nest års anslag med antall

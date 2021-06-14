@@ -30,10 +30,12 @@ bud <- navR::Budsjett$new(     name = "Test 1 for kap 2620, feb 2021",
 # Tabeller som viser statistikk.
 bud$lagRegnskapTabell( )
 bud$lagMottakerTabell()
+
 bud$lagTabellMndUtviklingRegnskap()
 bud$lagTabellMndUtviklingMottakere()
 
 # Denne kan være giRegnskapstallHistorie( ar == )
+
 ## Må forbedres. Gi regnskapstall for et gitt år.
 bud$giRegnskapstallIfjor( )
 
@@ -143,7 +145,7 @@ Dekomponer$new( anslag1 = bud$giHistoriskeAnslag()[[2]], anslag2 = bud$giAnslag(
 
 # Tabeller til forsiden ---------------------------------------------------
 
-
+bud$lagRegnskapTabell2( ans)
 
 
 
