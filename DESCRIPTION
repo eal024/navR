@@ -2,15 +2,15 @@ Package: navR
 Type: Package
 Title: Budsjettverktoy 
 Version: 0.1
-Authors@R: person("Magne", "Sortland" , "Eirik", "Lamoy", email = "first.last@example.com",
+Authors@R: person("Eirik", "Lamoy", email = "eirik.lamoy@nav.no",
                   role = c("aut", "cre"))
 Description: Funksjoner og koder til arbeidet i direktoratet. OO programutvidelse til hjelp for budjsettarbeidet
-License: What license is it under?
+License: nav
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Depends: 
-    R (>= 2.10)
+    R (>= 3.10)
 Imports: 
     lubridate,
     magrittr,
