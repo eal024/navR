@@ -1,6 +1,9 @@
 
 
 
+navR::create_wdir()
+
+
 # Oppsett budsjettanslag.
 # Eksempelet er basert på budsjettanslaget kapittel 2620 mars 2020.
 library(tidyverse)

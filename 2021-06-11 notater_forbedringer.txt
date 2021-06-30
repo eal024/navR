@@ -11,3 +11,12 @@ Forbedringer til programmet:
 2.	mndTabeller:
     -	Også nominell
     -	Leggtil mulighet til å justere nest års anslag med antall
+
+
+3. Ny tabell:
+    - Viser gjennomsnittlig ytelse.
+
+
+4. Budsjettdokumentet (template).
+    -
+
