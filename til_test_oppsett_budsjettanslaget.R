@@ -1,40 +1,41 @@
 
 
 
-navR::create_wdir()
-
-
 # Oppsett budsjettanslag.
 # Eksempelet er basert på budsjettanslaget kapittel 2620 mars 2020.
 library(tidyverse)
 library(navR)
+library(lubridate)
+
+# Data og forutsetninger.
+# Februar er siste måned med regnskap og mottakere
+regnskap_feb <- navR::regnskap   %>% mutate( dato = ymd(dato)) %>% filter( dato < lubridate::ymd("2021-03-01")) %>% arrange( desc(dato))
+mottakere_feb <- navR::mottakere %>% mutate( dato = ymd(dato)) %>% filter( dato < lubridate::ymd("2021-03-01"))%>% arrange( desc(dato))
 
 
-# Data og forutsetninger
-regnskap_feb <- navR::regnskap %>% filter( dato < lubridate::ymd("2021-03-01")) %>% arrange( desc(dato))
-mottakere_feb <- navR::mottakere %>% filter( dato < lubridate::ymd("2021-03-01"))%>% arrange( desc(dato))
-
-# Pris
-#g_20 <- 100853
+# Priser
+g_20 <- 100853
 g_21 <- 104514
 
 
 
-# Budsjettet
-bud <- navR::Budsjett$new(     name = "Test 1 for kap 2620, feb 2021",
-                               name_nytt_anslag = "feb2020",
-                               periode = 202102,
-                               dfRegnskap = regnskap_feb,
+# Budsjettet objektet
+bud <- navR::Budsjett$new(     name = "Test for kap 2620 enslig mor eller far, februar 2021",
+                               name_nytt_anslag = "februar 2021",
+                               periode = 202102, # Periode er siste måned med observasjoner.
+                               dfRegnskap = regnskap_feb %>% mutate(regnskap = ifelse( dato == ymd("2021-02-01"), 140247590,regnskap )),
                                dfMottakere =  mottakere_feb %>% mutate(kategori = "post70"),
-                               g_gjeldende = g_21,
-                               PRIS_VEKST = (104514/98866)
+                               g_gjeldende = g_21, # Anslaget skal være i 2021-priser.
+                               PRIS_VEKST = (104514/100853)
                           )
+
 
 # Tabeller som viser statistikk.
 bud$lagRegnskapTabell( )
 bud$lagMottakerTabell()
 
-bud$lagTabellMndUtviklingRegnskap()
+bud$lagTabellMndUtviklingRegnskap(  ) # Endre
+bud$lagTabellMndUtviklingRegnskap( tiltak_kost_ar1 = -38*10^6, tiltak_kost_ar2 = -25*10^6 ) # Endre
 bud$lagTabellMndUtviklingMottakere()
 
 # Denne kan være giRegnskapstallHistorie( ar == )
@@ -42,6 +43,8 @@ bud$lagTabellMndUtviklingMottakere()
 ## Må forbedres. Gi regnskapstall for et gitt år.
 bud$giRegnskapstallIfjor( )
 
+## Denne må må med.
+navR::AvgMottakereYtelse$new(name = "test", dfMottakere = mottakere_feb, regnskap_feb, gj_pris = 100000, ANSLAG_AR = 2021, ANSLAG_MND_PERIODE = 2)$lagTabell()
 
 
 # Vis anslag: Skal gi NULL

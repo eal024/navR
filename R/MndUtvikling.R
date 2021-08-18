@@ -37,11 +37,14 @@ MndUtvikling <- R6::R6Class( "mnd utvikling",
 
                                  },
                                  # Lag regnskapstabell
-                                 tabellMndUtvikling = function( ){
-                                     df_data <- private$df_data
-                                     var_ar <- private$anslag_ar
-                                     var_mnd <- private$anslag_mnd_periode
-                                     g_gjeldende <- private$g_gjeldende
+                                 tabellMndUtvikling = function( tiltak_kost_ar1 = NULL, tiltak_kost_ar2 = NULL ){
+
+                                     if(is.null(tiltak_kost_ar1)){ private$tiltak_kost_ar1  = 0} else{private$tiltak_kost_ar1 = tiltak_kost_ar1 }
+                                     if(is.null(tiltak_kost_ar2)){ private$tiltak_kost_ar2  = 0} else{private$tiltak_kost_ar2 = tiltak_kost_ar2 }
+                                     df_data         <- private$df_data
+                                     var_ar          <- private$anslag_ar
+                                     var_mnd         <- private$anslag_mnd_periode
+                                     g_gjeldende     <- private$g_gjeldende
 
 
 
@@ -131,9 +134,14 @@ MndUtvikling <- R6::R6Class( "mnd utvikling",
                                      #
                                      names(df_periode_tabell) <- c(names(df_periode_tabell)[c(1:(length(df_periode_tabell)-2) )],
                                                                    # Nytt navn neste år
-                                                                   str_c("anslag_", as.character(var_ar+1)),
+                                                                   str_c("anslag_", as.character(var_ar)),
                                                                    # Nytt navn året etter neste
-                                                                   str_c("anslag_", as.character(var_ar+2)) )
+                                                                   str_c("anslag_", as.character(var_ar+1)) )
+
+
+                                     # Legg til tiltak
+                                     df_periode_tabell[5] <- df_periode_tabell[5] + private$tiltak_kost_ar1
+                                     df_periode_tabell[6] <- df_periode_tabell[6] + private$tiltak_kost_ar1 + private$tiltak_kost_ar2
 
                                      # Retur:
                                      df_periode_tabell
@@ -157,6 +165,8 @@ MndUtvikling <- R6::R6Class( "mnd utvikling",
                                  PRIS_VEKST = NULL,
                                  MOTTAKERE_ARET_FOR = NULL,
                                  k = NULL,
-                                 g_gjeldende =  NULL
+                                 g_gjeldende =  NULL,
+                                 tiltak_kost_ar1 = NULL,
+                                 tiltak_kost_ar2 = NULL
                              )
 )

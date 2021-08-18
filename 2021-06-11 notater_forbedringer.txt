@@ -1,16 +1,21 @@
 
 
 Forbedringer til programmet:
+
 0. budsjett
     - giregnskapifjor -> må ha en funksjon som henter ut regnskapstall for det gitte året.
+    - (Regnskap mnd-utvikling) Mulighet til å legge til tiltakseffekt regnskap
+
+1.1 Mottakertabell
+    - mottakere -> må legge til post. Dette må endres
 
 1.	Regnskapstabell
     -	Printversjon av lagRegnskapstabell2( )
-    -
+    -   G/prisverdi i tabell.
 
 2.	mndTabeller:
     -	Også nominell
-    -	Leggtil mulighet til å justere nest års anslag med antall
+    -	(Mottakere) Leggtil mulighet til å justere nest års anslag med antall
 
 
 3. Ny tabell:

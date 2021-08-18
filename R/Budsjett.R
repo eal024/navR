@@ -115,7 +115,7 @@ Budsjett <- R6::R6Class( "Budsjett",
                                #
 
                                ## Månedsutvikling regnskapet
-                               lagTabellMndUtviklingRegnskap = function(   ) {
+                               lagTabellMndUtviklingRegnskap = function( tiltak_kost_ar1 = NULL, tiltak_kost_ar2 = NULL  ) {
 
                                    # If regnskapTabell or mottaker
                                    utvikling <- MndUtvikling$new( df_data = private$dfRegnskap,
@@ -123,12 +123,14 @@ Budsjett <- R6::R6Class( "Budsjett",
                                                                   anslag_ar = private$ar,
                                                                   anslag_mnd_periode = private$mnd,
                                                                   PRIS_VEKST = private$PRIS_VEKST,
-                                                                  REGNSKAP_ARET_FOR = private$REGNSKAP_ARET_FOR)
+                                                                  REGNSKAP_ARET_FOR = private$REGNSKAP_ARET_FOR
+
+                                                                  )
 
 
 
 
-                                   return( utvikling$tabellMndUtvikling())
+                                   return( utvikling$tabellMndUtvikling( tiltak_kost_ar1 = tiltak_kost_ar1 , tiltak_kost_ar2 = tiltak_kost_ar2  ))
 
                                },
 
