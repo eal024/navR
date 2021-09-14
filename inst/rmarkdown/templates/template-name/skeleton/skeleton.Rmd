@@ -1,50 +1,348 @@
 ---
-title: "Kapittel XXXX"
-author: "Her skriver du navn."
-date: "29 6 2021"
+title: "Kapittel 2620"
+author: "Test, kun post 70"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output: pdf_document
 editor_options:
   chunk_output_type: console
-  - \usepackage{placeins}
-    header-includes: 
 ---
 
 ```{r setup, include=FALSE}
+# Nødvendige pakker
 
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(lubridate)
 library(navR)
+library(kableExtra)
+
 ```
 
 ```{r forutsetninger, echo = F}
 
 
 # Data og forutsetninger
-regnskap_feb <- navR::regnskap %>% filter( dato < lubridate::ymd("2021-03-01")) %>% arrange( desc(dato))
-mottakere_feb <- navR::mottakere %>% filter( dato < lubridate::ymd("2021-03-01"))%>% arrange( desc(dato))
+regnskap_feb <- navR::regnskap %>% filter( dato < lubridate::ymd("2021-10-01")) %>% arrange( desc(dato))
+mottakere_feb <- navR::mottakere %>% filter( dato < lubridate::ymd("2021-10-01"))%>% arrange( desc(dato))
 
 # Pris
-#g_20 <- 100853
-g_21 <- 104514
+g_20 <- 100853
+g_21 <- 104716
+g_22 <- 104817
 
 ```
 
 
-```{r}
+```{r budsjettobjektet, include= F }
 
 # Budsjettet
-bud <- navR::Budsjett$new(     name = "Test 1 for kap 2620, feb 2021",
-                               name_nytt_anslag = "feb2020",
-                               periode = 202102,
+bud <- navR::Budsjett$new(     name = "Kap. 2020 Enslig mor eller far",
+                               name_nytt_anslag = "Oktober 2021",
+                               periode = 202108,
                                dfRegnskap = regnskap_feb,
                                dfMottakere =  mottakere_feb %>% mutate(kategori = "post70"),
                                g_gjeldende = g_21,
-                               PRIS_VEKST = (104514/98866)
+                               PRIS_VEKST = (g_21/g_20)
                           )
 ```
 
 
-## Overskrift 1
-## Overskrift 2
-## Overskrift 3
+```{r anslagene, include = F }
+
+regnskap_ifjor <- 
+  navR::Anslag$new(
+        name = str_c("Regnskap ", lubridate::year(bud$giPeriode())-1 ),
+        ar = 2020,
+        regnskap_ifjor = bud$giRegnskapstall( ar_til_bake = 2),
+        volumvekst = (1 - 0.034),
+        vekst_ytelse = (1-0.009),
+        prisvekst = 1.020,
+        tiltak = (1 - 0.0)
+    )
+
+
+forrige_iar <-
+    navR::Anslag$new(
+        name = "Anslag fra 21.7.21",
+        ar = 2021,
+        regnskap_ifjor = bud$giRegnskapstallIfjor(),
+        volumvekst = (1 - 0.00),
+        vekst_ytelse = (1-0.015),
+        prisvekst = 1.0383,
+        tiltak = (1 - 0.0229)
+    )
+
+vedtatt_iar <-
+    navR::Anslag$new(
+        name = "Anslag fra 21.3.21",
+        ar = 2021,
+        regnskap_ifjor = bud$giRegnskapstallIfjor(),
+        volumvekst = (1 + 0.0069),
+        vekst_ytelse = (1-0.005),
+        prisvekst = 1.0393,
+        tiltak = (1 - 0.02187)
+    )
+
+nytt_iar <-
+    navR::Anslag$new(
+        name = "NAVs nye anslag 2021",
+        ar = 2021, #(bud$giAr()+1)
+        regnskap_ifjor = bud$giRegnskapstallIfjor(),
+        volumvekst = (1 + 0.01),
+        vekst_ytelse = (1-0.015),
+        prisvekst = 1.0383,
+        tiltak = (1 - 0.0221)
+    )
+
+nytt_neste_ar <-
+    navR::Anslag$new(
+        name = "NAVs nye anslag 2022",
+        ar = 2022,
+        regnskap_ifjor = nytt_iar$giSumAnslag(),
+        volumvekst = (1 - 0.0226),
+        vekst_ytelse = (1-0.00),
+        prisvekst = 1.022,
+        tiltak = (1 - 0.0231)
+    )
+
+forrige_neste_ar <-
+    navR::Anslag$new(
+        name = "NAVs forrige anslag for 2022",
+        ar = 2022,
+        regnskap_ifjor = forrige_iar$giSumAnslag(),
+        volumvekst = (1 - 0.0226),
+        vekst_ytelse = (1-0.00),
+        prisvekst = 1.022,
+        tiltak = (1 - 0.0231)
+    )
+
+
+```
+
+
+```{r 2020-anslaget, include = F }
+forrige2020 <-
+    navR::Anslag$new(
+        name = "Anslag fra 27.7.20",
+        ar = 2020,
+        regnskap_ifjor = bud$giRegnskapstallIfjor(),
+        volumvekst = (1 - 0.034),
+        vekst_ytelse = (1-0.00),
+        prisvekst = 1.020,
+        tiltak = (1 - 0.0)
+    )
+
+nytt2020 <-
+    navR::Anslag$new(
+        name = "NAVs nye anslag",
+        ar = 2020,
+        regnskap_ifjor = bud$giRegnskapstallIfjor(),
+        volumvekst = (1 - 0.0452),
+        vekst_ytelse = (1-0.01),
+        prisvekst = 1.0201,
+        tiltak = (1 - 0.0)
+    )
+
+nytt2021 <-
+    navR::Anslag$new(
+        name = "NAVs nye anslag",
+        ar = 2021,
+        regnskap_ifjor = nytt2020$giSumAnslag(),
+        volumvekst = (1 - 0.0226),
+        vekst_ytelse = (1-0.00),
+        prisvekst = 1.022,
+        tiltak = (1 - 0.0231)
+    )
+
+```
+
+```{r utregning tabell1, echo = F}
+
+tabell1 <- tibble( name  = c("Vedtatt budsjett",
+                             forrige_iar$giAnslagNavn(),
+                             nytt_iar$giAnslagNavn(),
+                             "Endring fra vedtatt budjsett" ),
+                   value = c(forrige_iar$giSumAnslag(),
+                             forrige_iar$giSumAnslag(),
+                             nytt_iar$giSumAnslag(),
+                             nytt_iar$giSumAnslag() - forrige_iar$giSumAnslag()) 
+        ) %>% 
+    mutate( value = value/10^6 %>% round( digits = 0) ) %>% 
+    pivot_wider( names_from = name, values_from = value)
+
+
+```
+
+```{r utregning tabell2, echo =F}
+
+# Regnskapstabell
+
+tabell2 <- bud$lagRegnskapTabell2( anslag1 = nytt_iar ,
+                                   anslag2 = nytt_neste_ar      ) %>%
+    mutate_at( vars( regnskap , endring_regnskap, regnskap_fast, endring_regnskap_f ), function(x) {x/10^6}
+               ) %>%
+    mutate_at( vars(regnskap,  regnskap_fast) , function(x) ifelse(.$kategori == "Anslag", round(x, -1), x))
+
+```
+
+
+```{r utregning tabell3, echo = F}
+
+tabell3 <- bud$lagTabellMndUtviklingRegnskap()
+
+
+tabell3 <- tabell3 %>%
+    mutate( lengde = str_c("mnd ", lengde)) %>% 
+    mutate_if( is.numeric, function(x) ifelse( abs(x) > 1, round(x/10^6, digits = 0) %>% format( big.mark = " "), round(x, digits = 4 )*100 )) %>% 
+    select(-forrige, -naa)
+
+# Legg til år
+names(tabell3) <- c(
+    "Antall mnd",
+    "Prosentvis vekst i \nregnskapstallene målt i fast G",
+    str_c( "Budsjettanslag for ", "2021", " basert på\ntilsvarende vekst. Mill. kroner"),
+    str_c( "Budsjettanslag for ", "2022", " basert på\ntilsvarende vekst. Mill. kroner")
+)
+
+
+
+
+```
+
+
+```{r dekomponering, include=F}
+forrige_iar$setPris( pris = 100853)
+nytt_iar$setPris( pris = g_21)
+
+# Antall kan hentes direkte fra forutsetning om volum og antalgese om hvor stor del av tiltak som ikke treffer antall.
+endring2020 <- Dekomponer$new( anslag1 = forrige_iar, anslag2 = nytt_iar,  antall_1 = 10223 , antall_2 = 10348  )$giDekomponert()
+endring_anslag_iar_fra_sist <- Dekomponer$new( anslag1 = forrige_iar, anslag2 = nytt_iar,  antall_1 = 10223 , antall_2 = 10348  )$giDekomponert()
+#Dekomponer$new( anslag1 = forrige2020, anslag2 = nytt2020,  antall_1 = 10411 , antall_2 =10479  )$giDf()
+
+
+
+```
+
+
+
+## Post xx - beskrivelse av anslagene 
+```{r utprint tabell1, echo = F }
+knitr::kable(format = "latex",booktabs = T, escape = F, 
+             tabell1, 
+             digits = 0 )%>% 
+    kable_styling( latex_options = c("HOLD_position","striped"), stripe_index =  c(1) ) 
+
+```
+
+Arbeids- og velferdsdirektoratet tilrår et anslag for 2020 på `r round( nytt_iar$giSumAnslag()/10^6 , digits = 0) %>% format( big.mark = " " )` mill. kroner.
+Dette er XX mill. kroner lavere enn forrige anslag og vedtatt budsjett. For 2021 tilrås et anslag på `r round( nytt_neste_ar$giSumAnslag()/10^6 , digits = 0) %>% format( big.mark = " " )` mill. kroner. 
+
+De nye anslagene er basert på `r lubridate::month(bud$giPeriode(), label= T)`-tall.
+
+#### 1.1 Endringer og dekomponeringer av utgiftsanslaget$\\$ <br>
+$\\$ <br>
+__Endringer i `r nytt2020$giAnslagNavn()` for `r nytt2020$giAr()`  og `r nytt2021$giAr()` sammenlignet med forrige anslag:__
+
+`r nytt2020$giAr()`:\newline
+*-* Endret volumvekst har medført en anslagsendring for `r nytt2020$giAr() ` på `r endring2020$endring_mill[endring2020$tekst == "endret volum"] %>% format(digits = 0)` mill. kroner.  
+*-* Endret underliggende utvilling pris har medført en anslagsendring  på `r endring2020$endring_mill[endring2020$tekst == "effekt av pris"]` mill. kroner.  
+*-* Endret underliggende utvilling i gjennomsnittlig ytelse har medført en anslagsendring  på `r endring2020$endring_mill[endring2020$tekst == "snitt_beløp"] %>%  format(digits = 0) ` mill. kroner.\newline 
+<!-- *-* Endret forutsetning for tiltak har medført en anslagsendring  på AUTO. -->
+*-* Samlet anslagendring for `r nytt2020$giAr() ` er `r endring2020$endring_mill[endring2020$tekst == "totalt"] %>% format(digits = 0)` mill. kroner.
+
+`r nytt2021$giAr()`:\newline
+<!-- *-* Endret volumvekst har medført en anslagsendring for `r nytt2020$giAr() ` på HERSKAL DET AUTO.   -->
+<!-- *-* Endret underliggende utvilling pris har medført en anslagsendring  på HERSKAL DET AUTO.   -->
+<!-- *-* Endret underliggende utvilling i gjennomsnittlig ytelse har medført en anslagsendring  på Auto.\newline  -->
+<!-- *-* Endret forutsetning for tiltak har medført en anslagsendring  på AUTO. -->
+<!-- *-* Samlet anslagendring for `r nytt2020$giAr() ` er HER SKAL DET AUTO. -->
+
+
+
+
+### 1.2 Regnskapsutvikling
+
+```{r, echo = F}
+
+knitr::kable( format = "latex", booktabs = T, escape = F,
+              tabell2 %>% mutate_if( is.numeric, function(x){ ifelse(abs(x) > 1, round( x, digits = 0), round(x, digits = 2)) }) %>% 
+                  rename( Endring = endring_regnskap,
+                          vekst   = regnskap_vekst,
+                          `Mill. kr i 2020-G` = regnskap_fast,
+                          `Endring regnskap i 2020-G`  = endring_regnskap_f,
+                          `vekst faste kr` = regnskap_fast_vekst
+                          )
+                  ) %>% 
+    kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9) )  
+```
+
+
+
+
+Her skal det være beskrivende tekst for anslaget.
+
+Her kommer tabellen som viser månedsutvikling.
+
+\newpage
+```{r utprint regnskappermnd, echo = F, warning=F}
+
+
+tabell3 %>%
+   mutate_all(linebreak) %>%
+   kable(format = "latex", booktabs = T, escape = F,
+      col.names = linebreak( names(tabell3) ), align = "c" ) %>% 
+    kable_styling( latex_options = c("striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11) )  
+
+
+# knitr::kable("latex",booktabs = T, escape = F, tabell3,  col.names = linebreak( c("Item\n(Name)", "Value\n(Number)", "En", "To"), align = "c"),align = "c")  
+
+
+# kbl( tabell3 , booktabs = T, linesep = "" , caption = "Dette er tabellen som viser regnskapsutvikling, 3 til 12 måned\nsammenliknet med fjoråret.",
+#     col.names = linebreak(c("Item\n(Name)", "Value\n(Number)","Value\n(Number)","Value\n(Number)"), align = "c") ) %>% 
+#     kable_styling( latex_options = c("striped"), stripe_index =  c(1,3) )    
+
+```
+
+
+
+
+
+### 1.3	Forutsetninger og anslag
+
+```{r,echo = F, warning=F}
+
+endre_tekst <- function( df) { df %>% mutate( tekst = case_when( str_detect(tekst, "regnskap")  ~ "Regnskap",
+                             str_detect(tekst, "sum")  ~ "Sum",
+                             T ~ tekst
+                             )) }
+
+tabell_forutsetning <- tibble( anslag = list( regnskap_ifjor, vedtatt_iar ) ) %>% 
+  mutate( anslag_navn = map(anslag, ~.x$giAnslagNavn() ) ) %>% 
+  mutate( anslag = map(anslag, ~endre_tekst(.x$giDfAnslag() )),
+          anslag = map(anslag, ~.x %>% mutate(prosent = ifelse( tekst == "Sum", as.numeric(prosent)*100, prosent),
+                                              tall = format( tall, big.mark = " ", digits = 0),
+                                              prosent = format( prosent, digits = 1)))
+          ) %>% 
+  unnest(cols = c(anslag_navn, anslag) ) %>%
+  pivot_wider( names_from = anslag_navn, values_from = c(prosent,tall) ) %>% 
+  select(tekst, 2,4,3,5)
+
+names(tabell_forutsetning) <- map_chr( names(tabell_forutsetning) , function(x)  str_replace(x, pattern = "_", "\n") %>% str_to_sentence( ))
+  
+
+
+tabell_forutsetning %>% 
+  mutate_all(linebreak) %>%
+   kable(format = "latex", booktabs = T, escape = F,
+      col.names = linebreak( names(tabell_forutsetning) ), align = c("l", rep("r", times = 4)) ) %>% 
+    kable_styling( latex_options = c("HOLD_position", "striped", "scale_down"), stripe_index =  c(1,3,5,7), font_size = 6 )  
+
+```
+
+
+
+
+
+
+
+

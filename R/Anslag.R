@@ -127,7 +127,6 @@ Anslag <- R6::R6Class( "Anslag",
                            },
 
 
-
                            giDfAnslag = function( mill.kroner = T ) {
                                self$dfAnslag();
                                if( mill.kroner == T ) { return( private$DFAnslag %>% mutate( tall = tall/10^6) ) } else { return(private$DFAnslag) } },
