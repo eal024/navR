@@ -12,6 +12,7 @@ Forbedringer til programmet:
 1.	Regnskapstabell
     -	Printversjon av lagRegnskapstabell2( )
     -   G/prisverdi i tabell.
+    -   floor dato, funksjon.
 
 2.	mndTabeller:
     -	Også nominell (valg)
