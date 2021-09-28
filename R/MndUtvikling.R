@@ -24,9 +24,9 @@
 MndUtvikling <- R6::R6Class( "mnd utvikling",
 
                              public = list(
-                                 initialize = function( df_data, anslag_ar = NULL, anslag_mnd_periode = NULL, REGNSKAP_ARET_FOR = NULL , MOTTAKERE_ARET_FOR = NULL, PRIS_VEKST = NULL, g_gjeldende = NULL ) {
+                                 initialize = function( df_data, anslag_ar = NULL, anslag_mnd_periode = NULL, REGNSKAP_ARET_FOR = NULL , MOTTAKERE_ARET_FOR = NULL, PRIS_VEKST = NULL, pris_gjeldende = NULL ) {
                                      #library(lubridate)
-                                     private$g_gjeldende <- g_gjeldende
+                                     private$pris_gjeldende <- pris_gjeldende
                                      private$anslag_ar <- anslag_ar
                                      private$anslag_mnd_periode <- anslag_mnd_periode
                                      private$df_data <- df_data
@@ -44,7 +44,7 @@ MndUtvikling <- R6::R6Class( "mnd utvikling",
                                      df_data         <- private$df_data
                                      var_ar          <- private$anslag_ar
                                      var_mnd         <- private$anslag_mnd_periode
-                                     g_gjeldende     <- private$g_gjeldende
+                                     pris_gjeldende     <- private$pris_gjeldende
 
 
 
@@ -78,7 +78,7 @@ MndUtvikling <- R6::R6Class( "mnd utvikling",
                                              df_del2 <- df_del1 %>%
                                                  #
                                                  mutate( sum = map( df_data , function(x){
-                                                     x %>% mutate( verdier_faste = regnskap*g_gjeldende/g ) %>%  summarise( verdier_faste = sum(verdier_faste))})
+                                                     x %>% mutate( verdier_faste = regnskap*pris_gjeldende/pris ) %>%  summarise( verdier_faste = sum(verdier_faste))})
                                                  ),
                                              # Mottakere
                                              df_del2 <- df_del1 %>%
@@ -165,7 +165,7 @@ MndUtvikling <- R6::R6Class( "mnd utvikling",
                                  PRIS_VEKST = NULL,
                                  MOTTAKERE_ARET_FOR = NULL,
                                  k = NULL,
-                                 g_gjeldende =  NULL,
+                                 pris_gjeldende =  NULL,
                                  tiltak_kost_ar1 = NULL,
                                  tiltak_kost_ar2 = NULL
                              )
