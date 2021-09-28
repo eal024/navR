@@ -75,6 +75,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                            tidyr::drop_na() %>%
                                            dplyr::select( ar,  regnskap, endring_regnskap, regnskap_vekst, pris_snitt, regnskap_fast, endring_regnskap_f, regnskap_fast_vekst) %>%
                                            dplyr::mutate( ar = as.character(ar))
+
                                        # #
                                        # #
                                        # #
@@ -82,14 +83,14 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                        tabell_regnskap_del2 <-
                                            private$dfRegnskap %>%
                                            dplyr::select( dato, regnskap_nominell = regnskap, pris) %>%
-                                           dplyr::mutate( kategori = "post70") %>%
-                                           dplyr::filter(  lubridate::year(dato) <= (private$anslag_ar),  lubridate::year(dato) > (private$anslag_ar-3) , lubridate::month(dato) <= private$anslag_mnd_periode ) %>%
+                                           dplyr::filter(  lubridate::year(dato) <= (private$anslag_ar),
+                                                           lubridate::year(dato) > (private$anslag_ar-3) ,
+                                                           lubridate::month(dato) <= private$anslag_mnd_periode
+                                                            ) %>%
                                            dplyr::group_by( ar = lubridate::year(dato) ) %>%
-                                           dplyr::summarise( regnskap = sum( regnskap_nominell,na.rm = T),
+                                           dplyr::summarise( regnskap   =  sum( regnskap_nominell,na.rm = T),
                                                              pris_snitt =   mean(pris, na.rm = T),
-                                                             .groups = "drop") %>%
-                                           #kpi_snitt = mean(kpi_faktor_2015, na.rm = T),
-                                           #sats_snitt = mean(max_sats_1_barn_gml,na.rm = T)) %>%
+                                                             .groups    = "drop") %>%
                                            dplyr::filter( ar > 2013) %>%
                                            dplyr::mutate( regnskap_fast = ((regnskap*prisjusterer)/pris_snitt) ) %>%
                                            dplyr::mutate( ar = str_c(ar,"-",
@@ -97,16 +98,16 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                            dplyr::relocate( contains("snitt"), .after = last_col() )
                                        # #
                                        # #
-                                       # ceiling day TRUE
+                                       #
                                        if( celing_date == T ) {tabell_regnskap_del2 <- tabell_regnskap_del2 %>%
-                                                                                    dplyr::mutate( ar = (lubridate::ceiling_date(ymd(ar), unit = "month") -1) %>% as.character()  )  }
+                                           dplyr::mutate( ar = (lubridate::ceiling_date(ymd(ar), unit = "month") -1) %>% as.character()  )  }
 
                                        #
                                        tabell_regnskap_del2_2 <-
                                            tabell_regnskap_del2  %>%
                                            dplyr::mutate( verdi_faktor = pris_snitt ) %>%
                                            dplyr::mutate( faktor = "pris_snitt") %>%
-                                           # dplyr::group_by(  ar) %>%
+                                           #dplyr::group_by(  ar ) %>%
                                            dplyr::mutate( verdi_faktor_1 = verdi_faktor  )  %>%
                                            dplyr::distinct() %>%
                                            dplyr::mutate( endring_regnskap = regnskap-lag(regnskap),
@@ -116,7 +117,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                            tidyr::drop_na( ) %>%
                                            dplyr::select( ar,  regnskap, endring_regnskap, regnskap_vekst, pris_snitt = verdi_faktor_1, regnskap_fast, endring_regnskap_f, regnskap_fast_vekst)
 
-                                                                              #
+                                       #
                                        private$tabell_regnskap_historikk <- dplyr::bind_rows( tabell_regnskap_del1  %>% mutate( ar = as.character(ar)), tabell_regnskap_del2_2) %>%
                                            mutate( kategori = "Regnskap") %>%
                                            dplyr::ungroup()
@@ -126,12 +127,9 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                        #
 
 
-                                       return(private$tabell_regnskap_historikk)
-                                    #return(tabell_regnskap_del2_2)
-
-
-
-
+                                       return(private$tabell_regnskap_historikk  %>%
+                                                  dplyr::select( kategori, everything())
+                                              )
 
 
                                    },
@@ -167,7 +165,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                                           regnskap_fast_vekst = regnskap_fast/lag(regnskap_fast)-1) %>%
                                            tidyr::drop_na() %>%
                                            dplyr::mutate( ar = as.character(ar) ) %>%
-                                           dplyr::select( ar,  regnskap, endring_regnskap, regnskap_vekst,pris_snitt, regnskap_fast, endring_regnskap_f, regnskap_fast_vekst) %>%
+                                           dplyr::select( ar,  regnskap, endring_regnskap, regnskap_vekst,pris_snitt, regnskap_fast, endring_regnskap_f, regnskap_fast_vekst, kategori) %>%
                                            dplyr::filter( dplyr::between(ar, (private$anslag_ar), (private$anslag_ar+1) ) )
 
 
@@ -179,15 +177,16 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
 
                                        df  <- self$lagRegnskapTabell(celing_date = celing_date)
                                        df2 <- self$tabellRegnskapDel3(anslag1, anslag2)
-                                       df3 <- dplyr::bind_rows(df, df2)
+                                       df3 <- dplyr::bind_rows(df, df2) %>%
+                                           dplyr::select( kategori, everything())
 
                                        if( printversjon == FALSE){df3} else {
 
                                            #
                                            df3 %>% dplyr::mutate_at(
-                                                                    vars(regnskap, endring_regnskap, regnskap_fast, endring_regnskap_f),
-                                                                    function(x) x/10^6
-                                                                    )
+                                               vars(regnskap, endring_regnskap, regnskap_fast, endring_regnskap_f),
+                                               function(x) x/10^6
+                                           )
                                        }
 
                                    },

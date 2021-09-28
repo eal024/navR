@@ -23,8 +23,8 @@ library(kableExtra)
 
 
 # Data og forutsetninger
-regnskap_feb <- navR::regnskap %>% filter( dato < lubridate::ymd("2021-10-01")) %>% arrange( desc(dato))
-mottakere_feb <- navR::mottakere %>% filter( dato < lubridate::ymd("2021-10-01"))%>% arrange( desc(dato))
+regnskap <- navR::regnskap %>% filter( dato < lubridate::ymd("2021-10-01")) %>% arrange( desc(dato))
+mottakere <- navR::mottakere %>% filter( dato < lubridate::ymd("2021-10-01"))%>% arrange( desc(dato))
 
 # Pris
 g_20 <- 100853
@@ -41,9 +41,9 @@ g_22 <- 108287
 bud <- navR::Budsjett$new(     name = "Kap. 2020 Enslig mor eller far",
                                name_nytt_anslag = "Oktober 2021",
                                periode = 202108,
-                               dfRegnskap = regnskap_feb,
-                               dfMottakere =  mottakere_feb %>% mutate(kategori = "post70"),
-                               g_gjeldende = g_21,
+                               dfRegnskap = regnskap %>% rename( pris = g),
+                               dfMottakere =  mottakere %>% mutate(kategori = "post70"),
+                               pris_gjeldende = g_21,
                                PRIS_VEKST = (g_21/g_20)
                           )
 ```
@@ -123,6 +123,7 @@ forrige_neste_ar <-
 
 ```{r utregning tabell1, echo = F}
 
+# 
 tabell1 <- tibble( name  = c("År",
                              "Vedtatt budsjett",
                              forrige_iar$giAnslagNavn(),
@@ -246,8 +247,7 @@ Dette er `r format(abs(endring_fra_forrige_round), big.mark = " ")` mill. kroner
 
 De nye anslagene er basert på `r lubridate::month(bud$giPeriode(), label= T)`-tall.
 
-#### 1.1 Endringer og dekomponeringer av utgiftsanslaget$\\$ <br>
-$\\$ <br>
+#### 1.1 Endringer og dekomponeringer av utgiftsanslaget$\\$ <br>$\\$ <br>
 __Endringer i `r nytt_iar$giAnslagNavn()` for `r nytt_iar$giAr()`  og `r nytt_neste_ar$giAr()` sammenlignet med forrige anslag:__
 
 `r nytt_iar$giAr()`:\newline
@@ -271,31 +271,43 @@ __Endringer i `r nytt_iar$giAnslagNavn()` for `r nytt_iar$giAr()`  og `r nytt_ne
 \newpage
 ### 1.2 Regnskapsutvikling
 
-```{r, echo = F}
+```{r , echo = F}
 
-knitr::kable( format = "latex", booktabs = T, escape = F,
-              tabell2 %>% mutate_if( is.numeric, function(x){ ifelse(abs(x) > 1, round( x, digits = 0), round(x, digits = 2)) }) %>% 
-                  rename( Endring = endring_regnskap,
-                          vekst   = regnskap_vekst,
-                          `Mill. kr i 2021-G` = regnskap_fast,
-                          `Endring regnskap i 2021-G`  = endring_regnskap_f,
-                          `vekst faste kr` = regnskap_fast_vekst
-                          )
-                  ) %>% 
-    kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9) )  
+# Denne må endre navn variabler
+tabell2_2 <- tabell2 %>%
+  select(-kategori) %>% 
+  mutate_at( vars(regnskap, endring_regnskap  , regnskap_fast, endring_regnskap_f) ,function(x) format(x, digits = 0, big.mark = " ")) %>% 
+  mutate( pris_snitt = format(pris_snitt, digits = 0, big.mark = " ")) %>% 
+  mutate_at( vars(regnskap_vekst,regnskap_fast_vekst ) ,function(x) format(x*100, digits = 1)) %>%
+  rename( 
+    Endring = endring_regnskap,
+    vekst   = regnskap_vekst,
+    `Mill. kr \ni 2021-G` = regnskap_fast,
+    `Endring regnskap\n 2021-G`  = endring_regnskap_f,
+    `vekst faste kr` = regnskap_fast_vekst
+    )  
+
+tabell2_2 %>% 
+  mutate_all(linebreak) %>%
+  knitr::kable( format = "latex" , booktabs = T, escape = T, col.names = linebreak( names(tabell2_2) ) ) %>%  
+  kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11) )  
 
 fra_i_fjor <- (nytt_iar$giSumAnslag()/10^6- tabell2$regnskap[tabell2$ar == "2020"])
 
 fra_i_fjor_i_tekst <- ifelse(fra_i_fjor > 0, "høyere", "lavere")
+
+
 ```
 
 
 
 
-Her kan man bruke informasjon fra tabellen over. Eks. regnskapstallene for året `r nytt_iar$giAr()-1`  er  `r tabell2$regnskap[tabell2$ar == "2020"] %>% format(digits = 1)`, som er `r abs(fra_i_fjor) %>% format(digits = 1)` mill. kroner `r fra_i_fjor_i_tekst` enn anslag for 2021.
+Her kan man bruke informasjon fra tabellen over. Eks. regnskapstallene for året `r nytt_iar$giAr()-1`  er  `r tabell2$regnskap[tabell2$ar == "2020"] %>% format(digits = 1)`,
+som er `r abs(fra_i_fjor) %>% format(digits = 1)` mill. kroner `r fra_i_fjor_i_tekst` enn anslag for 2021.
 
 
 Tabell 3: Regnskapstall basert på månedsutvikling, samme periode i fjor.
+
 ```{r utprint regnskappermnd, echo = F, warning=F}
 
 

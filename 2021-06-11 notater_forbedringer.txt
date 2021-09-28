@@ -28,5 +28,5 @@ Forbedringer til programmet:
 
 
 4. Budsjettdokumentet (template).
-    -
+    - Tabell1: I eget objekt. Input-anslag -> følger overskrift og poster under
 

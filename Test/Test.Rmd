@@ -22,8 +22,8 @@ library(kableExtra)
 
 
 # Data og forutsetninger
-regnskap_feb <- navR::regnskap %>% filter( dato < lubridate::ymd("2020-10-01")) %>% arrange( desc(dato))
-mottakere_feb <- navR::mottakere %>% filter( dato < lubridate::ymd("2020-10-01"))%>% arrange( desc(dato))
+regnskap <- navR::regnskap %>% filter( dato < lubridate::ymd("2021-09-01")) %>% arrange( desc(dato))
+mottakere <- navR::mottakere %>% filter( dato < lubridate::ymd("2021-09-01"))%>% arrange( desc(dato))
 
 # Pris
 g_20 <- 100853
@@ -36,48 +36,84 @@ g_21 <- 103072
 
 # Budsjettet
 bud <- navR::Budsjett$new(     name = "Kap. 2020 Enslig mor eller far",
-                               name_nytt_anslag = "oktober 2020",
-                               periode = 202008,
-                               dfRegnskap = regnskap_feb %>%  rename( pris = g),
-                               dfMottakere =  mottakere_feb %>% mutate(kategori = "post70"),
+                               name_nytt_anslag = "oktober 2021",
+                               periode = 202108,
+                               dfRegnskap = regnskap  %>%  rename( pris = g),
+                               dfMottakere =  mottakere  %>% mutate(kategori = "post70"),
                                pris_gjeldende = g_20,
                                PRIS_VEKST = (104514/98866)
                           )
 ```
 
 ```{r 2020-anslaget, include = F }
-forrige2020 <-
-    navR::Anslag$new(
-        name = "Anslag fra 27.7.20",
-        ar = 2020,
-        regnskap_ifjor = bud$giRegnskapstallIfjor(),
-        volumvekst = (1 - 0.034),
-        vekst_ytelse = (1-0.00),
+
+regnskap_ifjor <- 
+  navR::Anslag$new(
+        name = str_c("Regnskap " ),
+        ar = lubridate::year(bud$giPeriode())-1,
+        regnskap_ifjor = bud$giRegnskapstall( ar_til_bake = 2),
+        volumvekst = (1 - 0.029),
+        vekst_ytelse = (1-0.014),
         prisvekst = 1.020,
         tiltak = (1 - 0.0)
     )
 
-nytt2020 <-
+
+forrige_iar <-
     navR::Anslag$new(
-        name = "NAVs nye anslag",
-        ar = 2020,
+        name = "Anslag fra 21.7.21",
+        ar = 2021,
         regnskap_ifjor = bud$giRegnskapstallIfjor(),
-        volumvekst = (1 - 0.0452),
-        vekst_ytelse = (1-0.01),
-        prisvekst = 1.0201,
-        tiltak = (1 - 0.0)
+        volumvekst = (1 - 0.00),
+        vekst_ytelse = (1-0.015),
+        prisvekst = 1.0383,
+        tiltak = (1 - 0.0229)
     )
 
-nytt2021 <-
+vedtatt_iar <-
+    navR::Anslag$new(
+        name = "Anslag fra 21.3.21",
+        ar = 2021,
+        regnskap_ifjor = bud$giRegnskapstallIfjor(),
+        volumvekst = (1 + 0.0069),
+        vekst_ytelse = (1-0.005),
+        prisvekst = 1.0393,
+        tiltak = (1 - 0.02187)
+    )
+
+nytt_iar <-
     navR::Anslag$new(
         name = "NAVs nye anslag",
-        ar = 2021,
-        regnskap_ifjor = nytt2020$giSumAnslag(),
-        volumvekst = (1 - 0.0226),
-        vekst_ytelse = (1-0.00),
-        prisvekst = 1.022,
-        tiltak = (1 - 0.0231)
+        ar = 2021, #(bud$giAr()+1)
+        regnskap_ifjor = bud$giRegnskapstallIfjor(),
+        volumvekst = (1 + 0.015),
+        vekst_ytelse = (1-0.026),
+        prisvekst = 1.0383,
+        tiltak = (1 - 0.0222)
     )
+
+nytt_neste_ar <-
+    navR::Anslag$new(
+        name = "NAVs nye anslag 2022",
+        ar = 2022,
+        regnskap_ifjor = nytt_iar$giSumAnslag(),
+        volumvekst = (1 - 0.005),
+        vekst_ytelse = (1-0.00),
+        prisvekst = 1.0341,
+        tiltak = (1 - 0.0145)
+    )
+
+forrige_neste_ar <-
+    navR::Anslag$new(
+        name = "NAVs forrige anslag for 2022",
+        ar = 2022,
+        regnskap_ifjor = forrige_iar$giSumAnslag(),
+        volumvekst = (1 - 0.0),
+        vekst_ytelse = (1-0.00),
+        prisvekst = 1.0341,
+        tiltak = (1 - 0.0145)
+    )
+
 
 ```
 
@@ -90,7 +126,7 @@ tabell1 <- tibble( name  = c("Vedtatt budsjett", forrige2020$giAnslagNavn(), nyt
     pivot_wider( names_from = name, values_from = value)
 
 # Regnskapstabell
-tabell2 <- bud$lagRegnskapTabell2( anslag1 = nytt2020 ,
+ %>% %>% %>% %>% %>%  <- bud$lagRegnskapTabell2( anslag1 = nytt2020 ,
                                    anslag2 = nytt2021      ) %>%
     mutate_at( vars( regnskap , endring_regnskap, regnskap_fast, endring_regnskap_f ), function(x) {x/10^6}
                ) %>%
