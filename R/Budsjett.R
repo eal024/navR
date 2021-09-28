@@ -4,7 +4,7 @@ Budsjett <- R6::R6Class( "Budsjett",
 
                            public = list(
                                #library(tidyverse),
-                               initialize = function( name, name_nytt_anslag, periode, dfRegnskap, g_gjeldende, dfMottakere, PRIS_VEKST, nyeAnslag = NULL, historiskeAnslag = NULL) {
+                               initialize = function( name, name_nytt_anslag, periode, dfRegnskap, pris_gjeldende, dfMottakere, PRIS_VEKST, nyeAnslag = NULL, historiskeAnslag = NULL) {
 
                                ## Private variabler deklareres:
                                    private$name <- name;
@@ -17,9 +17,9 @@ Budsjett <- R6::R6Class( "Budsjett",
                                    private$dfMottakere <- dfMottakere
 
                                    # Brukes i ulike tabeller
-                                   private$g_gjeldende <- g_gjeldende
+                                   private$pris_gjeldende <- pris_gjeldende
 
-                                   # Brukes anslag og månedsutvikling: Kan forenkles -> bruk kun g_gjeldende
+                                   # Brukes anslag og månedsutvikling: Kan forenkles -> bruk kun pris_gjeldende
                                    private$PRIS_VEKST <-PRIS_VEKST
 
                                    #private$tiltak_pst <- tiltak_pst
@@ -35,7 +35,7 @@ Budsjett <- R6::R6Class( "Budsjett",
                                #     # Object regnskapstabell -> se metodene lagRegnskapstabell
                                    private$regnskapTabell <- RegnskapTabell$new(
                                        dfRegnskap = private$dfRegnskap,
-                                       g_gjeldende = private$g_gjeldende,
+                                       pris_gjeldende = private$pris_gjeldende,
                                        anslag_ar = private$ar,
                                        anslag_mnd_periode = private$mnd)
 
@@ -125,7 +125,7 @@ Budsjett <- R6::R6Class( "Budsjett",
 
                                    # If regnskapTabell or mottaker
                                    utvikling <- MndUtvikling$new( df_data = private$dfRegnskap,
-                                                                  g_gjeldende = private$g_gjeldende,
+                                                                  pris_gjeldende = private$pris_gjeldende,
                                                                   anslag_ar = private$ar,
                                                                   anslag_mnd_periode = private$mnd,
                                                                   PRIS_VEKST = private$PRIS_VEKST,
@@ -147,7 +147,7 @@ Budsjett <- R6::R6Class( "Budsjett",
                                    utvikling <- MndUtvikling$new( df_data = private$dfMottakere,
                                                                   # For mottakere
                                                                   #df_data = private$dfMottakere,
-                                                                  g_gjeldende = private$g_gjeldende,
+                                                                  pris_gjeldende = private$pris_gjeldende,
                                                                   anslag_ar = private$ar,
                                                                   anslag_mnd_periode = private$mnd,
                                                                   PRIS_VEKST = private$PRIS_VEKST,
@@ -255,7 +255,7 @@ Budsjett <- R6::R6Class( "Budsjett",
                                           ar = NULL,
                                           mnd = NULL,
                                           dfRegnskap = NULL,
-                                          g_gjeldende = NULL,
+                                          pris_gjeldende = NULL,
                                           dfMottakere = NULL,
                                           PRIS_VEKST = NULL,
                                           #vekst_ytelse = NULL,

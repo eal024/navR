@@ -7,7 +7,7 @@
 #' Tabellen ma "lages" med metode "lagTabell".
 #'
 #' @param dfRegnskap data.frame med regnskapstall per mnd. input data skal ha tre rader  dato ("YYYY-MM-DD"), nominelle regnskapstall per mnd og prisjusterer per mnd.
-#' @param g_gjeldende  Forutsatt prisjusterer.
+#' @param pris_gjeldende  Forutsatt prisjusterer.
 #' @param anslag_ar  Gjeldende ar for anslaget
 #' @param anslag_mnd_periode  Gjeldende maned for anslaget
 #' @return Tabell med arlige summerte regnskapstall
@@ -15,7 +15,7 @@
 #' @examples
 #' Opprett forst class obj_tabell <- regnskapstabell:RegnskapTabell$new(
 #'    dfRegnskap = navR::regnskap,
-#'    g_gjeldende = 104817,
+#'    pris_gjeldende = 104817,
 #'    anslag_ar = 2021,
 #'    anslag_mnd_periode = 2,
 #'    post = "post70"
@@ -32,10 +32,10 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
 
                                public = list(
 
-                                   initialize = function( dfRegnskap, g_gjeldende, anslag_ar, anslag_mnd_periode, post = "post70"){
+                                   initialize = function( dfRegnskap, pris_gjeldende, anslag_ar, anslag_mnd_periode, post = "post70"){
                                        #
-                                       private$dfRegnskap  <-     dfRegnskap
-                                       private$g_gjeldende <-     g_gjeldende
+                                       private$dfRegnskap         <- dfRegnskap
+                                       private$pris_gjeldende     <- pris_gjeldende
                                        private$anslag_ar          <- anslag_ar
                                        private$anslag_mnd_periode <- anslag_mnd_periode
                                        private$post <- post
@@ -46,7 +46,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                    lagRegnskapTabell = function( celing_date = TRUE) {
 
                                        # Ma passe med resterende del
-                                       prisjusterer <- private$g_gjeldende
+                                       prisjusterer <- private$pris_gjeldende
 
                                        # Regnskaptabell
                                        tabell_regnskap_del0 <-
@@ -127,6 +127,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
 
 
                                        return(private$tabell_regnskap_historikk)
+                                    #return(tabell_regnskap_del2_2)
 
 
 
@@ -151,7 +152,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                            kategori = c("Anslag", "Anslag") ,
                                            ar =       c(anslag1$giAr(),anslag2$giAr() ),
                                            regnskap = c( anslag1$giSumAnslag(),anslag2$giSumAnslag()),
-                                           pris_snitt = c( private$g_gjeldende, private$g_gjeldende*anslag2$giPrisvekst() ),
+                                           pris_snitt = c( private$pris_gjeldende, private$pris_gjeldende*anslag2$giPrisvekst() ),
                                            regnskap_fast = c( anslag1$giSumAnslag() ,anslag2$giSumAnslag()/anslag2$giPrisvekst() )
                                        )
 
@@ -203,7 +204,7 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                    ifjor_regnskap = NULL,
                                    dfRegnskap = NULL,
                                    anslag_ar = NULL,
-                                   g_gjeldende = NULL,
+                                   pris_gjeldende = NULL,
                                    anslag_mnd_periode = NULL,
                                    tabell_regnskap_historikk = NULL,
                                    post = NULL,

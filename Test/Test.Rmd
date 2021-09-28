@@ -38,9 +38,9 @@ g_21 <- 103072
 bud <- navR::Budsjett$new(     name = "Kap. 2020 Enslig mor eller far",
                                name_nytt_anslag = "oktober 2020",
                                periode = 202008,
-                               dfRegnskap = regnskap_feb,
+                               dfRegnskap = regnskap_feb %>%  rename( pris = g),
                                dfMottakere =  mottakere_feb %>% mutate(kategori = "post70"),
-                               g_gjeldende = g_20,
+                               pris_gjeldende = g_20,
                                PRIS_VEKST = (104514/98866)
                           )
 ```
