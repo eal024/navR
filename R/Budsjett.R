@@ -95,9 +95,9 @@ Budsjett <- R6::R6Class( "Budsjett",
                                },
 
                                # Regnskapstabell med anslagene
-                               lagRegnskapTabell2 = function( anslag1 , anslag2  ){
+                               lagRegnskapTabell2 = function( anslag1 , anslag2 , printversjon = FALSE, celing_date = TRUE){
 
-                                   return( private$regnskapTabell$lagRegnskapTabell2(anslag1 = anslag1, anslag2 = anslag2)   )
+                                   return( private$regnskapTabell$lagRegnskapTabell2(anslag1 = anslag1, anslag2 = anslag2, printversjon = printversjon, celing_date = celing_date)   )
 
                                },
 

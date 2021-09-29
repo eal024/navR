@@ -151,15 +151,16 @@
 #
 # # Tabeller til forsiden ---------------------------------------------------
 #
-# bud$lagRegnskapTabell2( ans)
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
+gj_ytelse_test <-
+    navR::AvgMottakereYtelse$new(
+        name = "test",
+        dfMottakere = mottakere,
+        dfRegnskap = regnskap,
+        gj_pris = 104716,
+        ANSLAG_AR = 2021,
+        ANSLAG_MND_PERIODE = 8
+    )
+
+
+gj_ytelse_test$lagTabell()
+

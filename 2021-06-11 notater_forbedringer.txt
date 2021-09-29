@@ -20,6 +20,7 @@ Forbedringer til programmet:
     -   (Regnskap) prosenttall vist som "character" og med abbr. %. Valg at de kan komme i tall.
     -	(Mottakere) Leggtil mulighet til å justere nest års anslag med antall.
     -   Mnd (i streng, koblet med abbr. månedsnavn)
+    -   Mnd. korrigert for tiltak.
 
 
 3. Ny tabell:
@@ -29,4 +30,9 @@ Forbedringer til programmet:
 
 4. Budsjettdokumentet (template).
     - Tabell1: I eget objekt. Input-anslag -> følger overskrift og poster under
+    - Tabell2: Bedre formatering. Ide å gjøre dette klart i lagRegnskapstabell?
 
+
+5. Antall mottakere
+    - Inkluder anslag
+    - Hånder tiltak vs. hva som treffer ytelse og antall.

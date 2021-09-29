@@ -186,7 +186,9 @@ RegnskapTabell <- R6::R6Class( "Regnskapstabell",
                                            df3 %>% dplyr::mutate_at(
                                                vars(regnskap, endring_regnskap, regnskap_fast, endring_regnskap_f),
                                                function(x) x/10^6
-                                           )
+                                           ) %>%
+                                               dplyr::mutate_at(vars(regnskap_vekst, regnskap_fast_vekst), function(x) x*100) %>%
+                                               mutate_all( function(x) format(x, big.mark = " ", digits = 1))
                                        }
 
                                    },
