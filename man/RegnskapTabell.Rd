@@ -13,22 +13,27 @@ Tabellen viser nominelle og prisjustert utgifter. Per ar og per mnd i innevaeren
 Tabellen ma "lages" med metode "lagTabell".
 }
 \examples{
-Opprett forst class regnskapstabell:RegnskapTabell$new(
+Opprett forst class obj_tabell <- regnskapstabell:RegnskapTabell$new(
    dfRegnskap = navR::regnskap,
-   g_gjeldende = 104817,
+   pris_gjeldende = 104817,
    anslag_ar = 2021,
    anslag_mnd_periode = 2,
    post = "post70"
    )
 
 Dertter lag tabell med metode:
-RegnskapTabell$lagRegnskapTabell()
+obj_tabell$lagRegnskapTabell()
+NÃ¥r anslaget er laget legges anslagene til med metoden lagRegnskapTabell2( anslag1, anslag2 ),
+eks: obj_tabell$lagRegnskapTabell2(anslag2020, anslag2021)
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{RegnskapTabell$new()}}
 \item \href{#method-lagRegnskapTabell}{\code{RegnskapTabell$lagRegnskapTabell()}}
+\item \href{#method-giRegnskaptallAr}{\code{RegnskapTabell$giRegnskaptallAr()}}
+\item \href{#method-tabellRegnskapDel3}{\code{RegnskapTabell$tabellRegnskapDel3()}}
+\item \href{#method-lagRegnskapTabell2}{\code{RegnskapTabell$lagRegnskapTabell2()}}
 \item \href{#method-print}{\code{RegnskapTabell$print()}}
 \item \href{#method-clone}{\code{RegnskapTabell$clone()}}
 }
@@ -40,7 +45,7 @@ RegnskapTabell$lagRegnskapTabell()
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{RegnskapTabell$new(
   dfRegnskap,
-  g_gjeldende,
+  pris_gjeldende,
   anslag_ar,
   anslag_mnd_periode,
   post = "post70"
@@ -52,7 +57,7 @@ RegnskapTabell$lagRegnskapTabell()
 \describe{
 \item{\code{dfRegnskap}}{data.frame med regnskapstall per mnd. input data skal ha tre rader  dato ("YYYY-MM-DD"), nominelle regnskapstall per mnd og prisjusterer per mnd.}
 
-\item{\code{g_gjeldende}}{Forutsatt prisjusterer.}
+\item{\code{pris_gjeldende}}{Forutsatt prisjusterer.}
 
 \item{\code{anslag_ar}}{Gjeldende ar for anslaget}
 
@@ -66,7 +71,39 @@ RegnskapTabell$lagRegnskapTabell()
 \if{latex}{\out{\hypertarget{method-lagRegnskapTabell}{}}}
 \subsection{Method \code{lagRegnskapTabell()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RegnskapTabell$lagRegnskapTabell()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RegnskapTabell$lagRegnskapTabell(celing_date = TRUE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-giRegnskaptallAr"></a>}}
+\if{latex}{\out{\hypertarget{method-giRegnskaptallAr}{}}}
+\subsection{Method \code{giRegnskaptallAr()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RegnskapTabell$giRegnskaptallAr(ar)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tabellRegnskapDel3"></a>}}
+\if{latex}{\out{\hypertarget{method-tabellRegnskapDel3}{}}}
+\subsection{Method \code{tabellRegnskapDel3()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RegnskapTabell$tabellRegnskapDel3(anslag1, anslag2)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-lagRegnskapTabell2"></a>}}
+\if{latex}{\out{\hypertarget{method-lagRegnskapTabell2}{}}}
+\subsection{Method \code{lagRegnskapTabell2()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RegnskapTabell$lagRegnskapTabell2(
+  anslag1,
+  anslag2,
+  printversjon = FALSE,
+  celing_date = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 }

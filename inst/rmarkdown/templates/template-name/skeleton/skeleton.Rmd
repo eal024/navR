@@ -40,7 +40,7 @@ g_22 <- 108287
 # Budsjettet
 bud <- navR::Budsjett$new(     name = "Kap. 2020 Enslig mor eller far",
                                name_nytt_anslag = "Oktober 2021",
-                               periode = 202108,
+                               periode = 202106,
                                dfRegnskap = regnskap %>% rename( pris = g),
                                dfMottakere =  mottakere %>% mutate(kategori = "post70"),
                                pris_gjeldende = g_21,
@@ -226,8 +226,8 @@ gj_ytelse <-
         dfMottakere = mottakere,
         dfRegnskap = regnskap,
         gj_pris = g_21,
-        ANSLAG_AR = 2021,
-        ANSLAG_MND_PERIODE = 8
+        ANSLAG_AR = bud$giPeriode() %>% lubridate::year(),
+        ANSLAG_MND_PERIODE = bud$giPeriode() %>% lubridate::month()
     )
 
 tabell5_gj_ytelse <- gj_ytelse$lagTabell() %>% 
@@ -295,7 +295,7 @@ endring_tekst_vedtatt <- ifelse(endring_fra_vedtatt > 0, "høyere", "lavere")
 Arbeids- og velferdsdirektoratet tilrår et anslag for 2020 på `r round( nytt_iar$giSumAnslag()/10^6 , digits = 0) %>% format( big.mark = " " )` mill. kroner.
 Dette er `r format(abs(endring_fra_forrige_round), big.mark = " ")` mill. kroner `r endring_tekst` enn forrige anslag og  `r format(abs(endring_fra_vedtatt), digits = 0)` mill. kroner `r endring_tekst_vedtatt` enn vedtatt budsjett. For 2021 tilrås et anslag på `r round( nytt_neste_ar$giSumAnslag()/10^6 , digits = 0) %>% format( big.mark = " " )` mill. kroner. 
 
-De nye anslagene er basert på `r lubridate::month(bud$giPeriode(), label= T)`-tall.
+De nye anslagene er basert på `r navR::gi_mnd_navn(bud$giPeriode() ) `-tall.
 
 #### 1.1 Endringer og dekomponeringer av utgiftsanslaget$\\$ <br>$\\$ <br>
 __Endringer i `r nytt_iar$giAnslagNavn()` for `r nytt_iar$giAr()`  og `r nytt_neste_ar$giAr()` sammenlignet med forrige anslag:__

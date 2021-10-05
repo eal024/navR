@@ -41,7 +41,7 @@ Dertter navR::MndUtvikling$new()$tabellMndUtvikling()
   REGNSKAP_ARET_FOR = NULL,
   MOTTAKERE_ARET_FOR = NULL,
   PRIS_VEKST = NULL,
-  g_gjeldende = NULL
+  pris_gjeldende = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -62,7 +62,7 @@ Dertter navR::MndUtvikling$new()$tabellMndUtvikling()
 \if{latex}{\out{\hypertarget{method-tabellMndUtvikling}{}}}
 \subsection{Method \code{tabellMndUtvikling()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MndUtvikling$tabellMndUtvikling()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MndUtvikling$tabellMndUtvikling(tiltak_kost_ar1 = NULL, tiltak_kost_ar2 = NULL)}\if{html}{\out{</div>}}
 }
 
 }

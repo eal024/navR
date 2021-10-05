@@ -23,9 +23,10 @@ Forbedringer til programmet:
     -   Mnd. korrigert for tiltak.
 
 
-3. Ny tabell:
+3. Tabell Gj_ytelse:
     x- Viser gjennomsnittlig ytelse.
     - Legge til anslag
+    - ceiling date
 
 
 4. Budsjettdokumentet (template).
@@ -36,3 +37,6 @@ Forbedringer til programmet:
 5. Antall mottakere
     - Inkluder anslag
     - Hånder tiltak vs. hva som treffer ytelse og antall.
+
+6. Diverse
+    v Egen funksjon som endrer month() til navn
