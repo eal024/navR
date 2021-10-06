@@ -9,8 +9,8 @@ library(lubridate)
 
 # Data og forutsetninger.
 # Februar er siste måned med regnskap og mottakere
-regnskap_feb <- navR::regnskap   %>% mutate( dato = ymd(dato)) %>% filter( dato < lubridate::ymd("2021-03-01")) %>% arrange( desc(dato))
-mottakere_feb <- navR::mottakere %>% mutate( dato = ymd(dato)) %>% filter( dato < lubridate::ymd("2021-03-01"))%>% arrange( desc(dato))
+regnskap <- navR::regnskap   %>% mutate( dato = ymd(dato)) %>% rename( pris = g) %>% filter( dato < ymd("2021-08-01"))
+mottakere <- navR::mottakere %>% mutate( dato = ymd(dato))%>% filter( dato < ymd("2021-08-01"))
 
 
 # Priser
@@ -22,9 +22,9 @@ g_21 <- 104514
 # Budsjettet objektet
 bud <- navR::Budsjett$new(     name = "Test for kap 2620 enslig mor eller far, februar 2021",
                                name_nytt_anslag = "februar 2021",
-                               periode = 202102, # Periode er siste måned med observasjoner.
-                               dfRegnskap = regnskap_feb %>% mutate(regnskap = ifelse( dato == ymd("2021-02-01"), 140247590,regnskap )),
-                               dfMottakere =  mottakere_feb %>% mutate(kategori = "post70"),
+                               periode = 202108, # Periode er siste måned med observasjoner.
+                               dfRegnskap = regnskap %>% mutate(regnskap = ifelse( dato == ymd("2021-02-01"), 140247590,regnskap )),
+                               dfMottakere =  mottakere %>% mutate(kategori = "post70"),
                                pris_gjeldende = g_21, # Anslaget skal være i 2021-priser.
                                PRIS_VEKST = (104514/100853)
                           )
@@ -32,11 +32,15 @@ bud <- navR::Budsjett$new(     name = "Test for kap 2620 enslig mor eller far, f
 
 bud$giPeriode()
 
+
+
+
+
 # Tabeller som viser statistikk.
 bud$lagRegnskapTabell( )
 bud$lagMottakerTabell()
 
-bud$lagTabellMndUtviklingRegnskap(  ) # Endre
+bud$lagTabellMndUtviklingRegnskap()
 bud$lagTabellMndUtviklingRegnskap( tiltak_kost_ar1 = -38*10^6, tiltak_kost_ar2 = -25*10^6 ) # Endre
 bud$lagTabellMndUtviklingMottakere()
 

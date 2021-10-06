@@ -19,7 +19,7 @@ Forbedringer til programmet:
     -	Også nominell (valg)
     -   (Regnskap) prosenttall vist som "character" og med abbr. %. Valg at de kan komme i tall.
     -	(Mottakere) Leggtil mulighet til å justere nest års anslag med antall.
-    -   Mnd (i streng, koblet med abbr. månedsnavn)
+    v   Mnd (i streng, koblet med abbr. månedsnavn)
     -   Mnd. korrigert for tiltak.
 
 

@@ -40,7 +40,7 @@ g_22 <- 108287
 # Budsjettet
 bud <- navR::Budsjett$new(     name = "Kap. 2020 Enslig mor eller far",
                                name_nytt_anslag = "Oktober 2021",
-                               periode = 202106,
+                               periode = 202108,
                                dfRegnskap = regnskap %>% rename( pris = g),
                                dfMottakere =  mottakere %>% mutate(kategori = "post70"),
                                pris_gjeldende = g_21,
@@ -183,14 +183,14 @@ tabell3 <- bud$lagTabellMndUtviklingRegnskap()
 
 
 tabell3 <- tabell3 %>%
-    mutate( lengde = str_c("mnd ", lengde)) %>% 
+    ungroup() %>% 
     mutate_if( is.numeric, function(x) ifelse( abs(x) > 1, round(x/10^6, digits = 0) %>% format( big.mark = " "), round(x, digits = 4 )*100 )) %>% 
-    select(-forrige, -naa)
+    select(-forrige, -naa) 
 
 # Legg til år
 names(tabell3) <- c(
-    "Antall mnd",
-    "Prosentvis vekst i \nregnskapstallene målt i fast G",
+    str_c("Periode\nFra og med – til og med"),
+    str_c("Prosentvis vekst i \nregnskapstallene målt i fast G"),
     str_c( "Budsjettanslag for ", "2021", " basert på\ntilsvarende vekst. Mill. kroner"),
     str_c( "Budsjettanslag for ", "2022", " basert på\ntilsvarende vekst. Mill. kroner")
 )
@@ -204,19 +204,18 @@ names(tabell3) <- c(
 
 
 
-tabell4_mnd_utvikling_mottakere <- bud$lagTabellMndUtviklingMottakere()
+tabell4_mnd_utvikling_mottakere <- bud$lagTabellMndUtviklingMottakere() %>% ungroup()
 
 tabell4_mnd_utvikling_mottakere_2 <-tabell4_mnd_utvikling_mottakere %>%
-    mutate( lengde = str_c("mnd ", lengde)) %>% 
     mutate_if( is.numeric, function(x) ifelse( abs(x) > 1, round(x/1, digits = 0) %>% format( big.mark = " "), round(x, digits = 4 )*100 )) %>% 
     select(-forrige, -naa)
 
 
 names(tabell4_mnd_utvikling_mottakere_2) <- c(
-    "Antall mnd",
+    str_c("Periode\nFra og med – til og med"),
     "Prosentvis vekst i \nantall motakere året før",
-    str_c( "Antall år ", "2021", " basert på\nvekst mnd."),
-    str_c( "Budsjettanslag for ", "2022", " basert på\nvekst mnd.")
+    "Antall år 2021\nbasert på vekst mnd.",
+    str_c( "Budsjettanslag for\n", "2022", " basert på vekst mnd.")
 )
 
 
@@ -348,13 +347,13 @@ som er `r abs(fra_i_fjor) %>% format(digits = 1)` mill. kroner `r fra_i_fjor_i_t
 
 Tabell 3: Regnskapstall basert på månedsutvikling, samme periode i fjor.
 
-```{r utprint regnskappermnd, echo = F, warning=F}
+```{r utprintregnskappermnd, echo = F, warning=F, error=F}
 
 
 tabell3 %>%
    mutate_all(linebreak) %>%
    kable(format = "latex", booktabs = T, escape = F,
-      col.names = linebreak( names(tabell3) ), align = "c" ) %>% 
+      col.names = linebreak( names(tabell3) ), align = "lc" ) %>% 
     kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11) )  
 
 
@@ -374,9 +373,8 @@ Tabell 4: Antall mottakere basert på månedsutvikling, samme periode i fjor.
 
 tabell4_mnd_utvikling_mottakere_2 %>%
    mutate_all(linebreak) %>%
-   kable(format = "latex", booktabs = T, escape = F,
-      col.names = linebreak( names(tabell4_mnd_utvikling_mottakere_2) ), align = "c" ) %>% 
-    kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11) )  
+   kable(format = "latex", booktabs = T, escape = F, col.names = linebreak( names(tabell4_mnd_utvikling_mottakere_2) ), align = rep("c", times = ncol(tabell4_mnd_utvikling_mottakere_2) ) ) %>% 
+    kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11) ,font_size = 6)  
 
 
 ```

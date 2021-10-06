@@ -133,10 +133,14 @@ Budsjett <- R6::R6Class( "Budsjett",
 
                                    )
 
+                                   # Utvikling tabell.
+                                    mndTabellRegnskap <- utvikling$tabellMndUtvikling( tiltak_kost_ar1 = tiltak_kost_ar1 , tiltak_kost_ar2 = tiltak_kost_ar2  )
 
+                                    mndTabellRegnskap_1 <- mndTabellRegnskap %>%
+                                        group_by(lengde) %>%
+                                        mutate( lengde =  stringr::str_c( periode_for( self$giPeriode(), lengde, ar = 1), " til ",periode_for(self$giPeriode(), lengde, ar = 0)  ) )
 
-
-                                   return( utvikling$tabellMndUtvikling( tiltak_kost_ar1 = tiltak_kost_ar1 , tiltak_kost_ar2 = tiltak_kost_ar2  ))
+                                   return( mndTabellRegnskap_1 )
 
                                },
 
@@ -154,7 +158,12 @@ Budsjett <- R6::R6Class( "Budsjett",
                                                                   REGNSKAP_ARET_FOR = private$REGNSKAP_ARET_FOR,
                                                                   MOTTAKERE_ARET_FOR = private$MOTTAKERE_ARET_FOR )
 
-                                   return( utvikling$tabellMndUtvikling() )
+                                   df <- utvikling$tabellMndUtvikling() %>%
+                                       group_by(lengde) %>%
+                                       mutate( lengde =  stringr::str_c( periode_for( self$giPeriode(), lengde, ar = 1), " til ",periode_for(self$giPeriode(), lengde, ar = 0)  ) )
+
+
+                                   return( df )
 
                                },
 
