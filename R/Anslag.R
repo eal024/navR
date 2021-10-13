@@ -154,11 +154,17 @@ Anslag <- R6::R6Class( "Anslag",
                                self$dfAnslag()
                                },
 
+                           setAntallMottakere = function( antall ) {
+                               private$anslag_antall = antall
+                           },
+
                            giSumAnslag = function( ) {
                                self$dfAnslag()
                                private$anslag_tall},
 
                            giPrisvekst = function( ) { private$prisvekst },
+
+                           giAntallMottakere = function( ) { private$anslag_antall},
 
                            giAr = function( ) { private$ar },
 
@@ -208,6 +214,7 @@ Anslag <- R6::R6Class( "Anslag",
                            underregulering = NULL,
                            # Anslaget
                            anslag_tall = NULL,
+                           anslag_antall = NULL,
                            DFAnslag = NULL
 
                        )

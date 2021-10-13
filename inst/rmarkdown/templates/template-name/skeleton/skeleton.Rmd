@@ -23,7 +23,7 @@ library(kableExtra)
 
 
 # Data og forutsetninger
-regnskap <- navR::regnskap %>% filter( dato < lubridate::ymd("2021-10-01")) %>% arrange( desc(dato))
+regnskap <- navR::regnskap %>% filter( dato < lubridate::ymd("2021-10-01")) %>% arrange( desc(dato)) %>% dplyr::rename( pris = g)
 mottakere <- navR::mottakere %>% filter( dato < lubridate::ymd("2021-10-01"))%>% arrange( desc(dato))
 
 # Pris
@@ -41,7 +41,7 @@ g_22 <- 108287
 bud <- navR::Budsjett$new(     name = "Kap. 2020 Enslig mor eller far",
                                name_nytt_anslag = "Oktober 2021",
                                periode = 202108,
-                               dfRegnskap = regnskap %>% rename( pris = g),
+                               dfRegnskap = regnskap,
                                dfMottakere =  mottakere %>% mutate(kategori = "post70"),
                                pris_gjeldende = g_21,
                                PRIS_VEKST = (g_21/g_20)
@@ -223,13 +223,13 @@ gj_ytelse <-
     navR::AvgMottakereYtelse$new(
         name = "test",
         dfMottakere = mottakere,
-        dfRegnskap = regnskap,
+        dfRegnskap = regnskap ,
         gj_pris = g_21,
         ANSLAG_AR = bud$giPeriode() %>% lubridate::year(),
         ANSLAG_MND_PERIODE = bud$giPeriode() %>% lubridate::month()
     )
 
-tabell5_gj_ytelse <- gj_ytelse$lagTabell() %>% 
+tabell5_gj_ytelse <- gj_ytelse$lagTabell2( nested_liste_anslag = list( anslag =  c(nytt_iar, nytt_neste_ar), Forrige = c(forrige_iar, forrige_neste_ar))) %>% 
   mutate_if( is.numeric, function(x) ifelse( abs(x) > 1, round(x/1, digits = 0) %>% format( big.mark = " "), round(x, digits = 4 )*100 )) %>% 
   rename(
     `År` = ar, 

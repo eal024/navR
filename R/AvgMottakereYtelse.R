@@ -25,7 +25,7 @@ AvgMottakereYtelse <- R6::R6Class( "Gjennomsnittlig antall mottakere og gjennoms
                                       private$dfRegnskap %>%
                                       # Legger til mottakere
                                       dplyr::left_join( private$dfMottakere, by = "dato" ) %>%
-                                      dplyr::mutate   ( regnskap_fast = regnskap*(private$gj_pris/g) )
+                                      dplyr::mutate   ( regnskap_fast = regnskap*(private$gj_pris/pris) )
 
                                   del1 <- df %>%
                                       dplyr::group_by ( ar            = year(dato) ) %>%
@@ -73,7 +73,7 @@ AvgMottakereYtelse <- R6::R6Class( "Gjennomsnittlig antall mottakere og gjennoms
                                       )
 
                                     ## Retur denne.
-                                  dplyr::bind_rows(del1 , del2 ) %>% na.omit() %>%
+                                  private$tabellAvgYtelseAvgMottakere <- dplyr::bind_rows(del1 , del2 ) %>% na.omit() %>%
                                       dplyr::select( ar,
                                                      antall = mottakere,
                                                      antall_endring = endring_mottakere,
@@ -82,9 +82,37 @@ AvgMottakereYtelse <- R6::R6Class( "Gjennomsnittlig antall mottakere og gjennoms
                                                      ytelse_endring = endring_regnskap_prosent
                                                      )
 
+                                  private$tabellAvgYtelseAvgMottakere
+
 
 
                               },
+
+                                ## Fortsette med denne ....
+                              lagTabell2 = function( nested_liste_anslag ) {
+
+                                  l <- nested_liste_anslag
+
+                                  df_liste <- vector(mode = "list" )
+
+                                  for( i in 1:length(l) ){
+
+                                      df_liste[[names(l)[i]]] <- gj_ytelse_anslag( tabell  = self$lagTabell(),
+                                                                         gj_ar   = as.numeric(private$ANSLAG_AR),
+                                                                         anslag  = l[[i]],
+                                                                         gi_navn = names(l)[i]
+                                                                         )
+
+                                  }
+
+
+                                  bind_rows( self$lagTabell() %>% dplyr::mutate( navn = "Faktisk" ),
+                                             bind_rows( df_liste ) %>% dplyr::mutate( ar = as.character(ar)) ) %>%
+                                      dplyr::relocate( navn, .before = ar)
+
+
+                              },
+
 
                               # Print
                               print = function(...){
@@ -92,12 +120,13 @@ AvgMottakereYtelse <- R6::R6Class( "Gjennomsnittlig antall mottakere og gjennoms
                           ),
                               # Private
                           private = list(
-                                         name               = NULL,
-                                         dfMottakere        = NULL,
-                                         dfRegnskap         = NULL,
-                                         tabellMottakere    = NULL,
-                                         ANSLAG_AR          = NULL,
-                                         ANSLAG_MND_PERIODE = NULL,
-                                         gj_pris            = NULL
+                                         name                        = NULL,
+                                         dfMottakere                 = NULL,
+                                         dfRegnskap                  = NULL,
+                                         tabellMottakere             = NULL,
+                                         ANSLAG_AR                   = NULL,
+                                         ANSLAG_MND_PERIODE          = NULL,
+                                         gj_pris                     = NULL,
+                                         tabellAvgYtelseAvgMottakere = NULL
                                          )
 )

@@ -17,8 +17,6 @@ mottakere <- navR::mottakere %>% mutate( dato = ymd(dato))%>% filter( dato < ymd
 g_20 <- 100853
 g_21 <- 104514
 
-
-
 # Budsjettet objektet
 bud <- navR::Budsjett$new(     name = "Test for kap 2620 enslig mor eller far, februar 2021",
                                name_nytt_anslag = "februar 2021",
@@ -28,33 +26,6 @@ bud <- navR::Budsjett$new(     name = "Test for kap 2620 enslig mor eller far, f
                                pris_gjeldende = g_21, # Anslaget skal være i 2021-priser.
                                PRIS_VEKST = (104514/100853)
                           )
-
-
-bud$giPeriode()
-
-
-
-
-
-# Tabeller som viser statistikk.
-bud$lagRegnskapTabell( )
-bud$lagMottakerTabell()
-
-bud$lagTabellMndUtviklingRegnskap()
-bud$lagTabellMndUtviklingRegnskap( tiltak_kost_ar1 = -38*10^6, tiltak_kost_ar2 = -25*10^6 ) # Endre
-bud$lagTabellMndUtviklingMottakere()
-
-# Denne kan være giRegnskapstallHistorie( ar == )
-
-## Må forbedres. Gi regnskapstall for et gitt år.
-bud$giRegnskapstallIfjor( )
-
-## Denne må må med.
-navR::AvgMottakereYtelse$new(name = "test", dfMottakere = mottakere_feb, regnskap_feb, gj_pris = 100000, ANSLAG_AR = 2021, ANSLAG_MND_PERIODE = 2)$lagTabell()
-
-
-# Vis anslag: Skal gi NULL
-bud$giAnslag()
 
 # Ny klasse anslag
 nyttAnslag2021 <-
@@ -69,14 +40,6 @@ nyttAnslag2021 <-
     )
 
 
-nyttAnslag2021$giDfAnslag()
-
-# Legger til nye anslag
-bud$leggTilNyttAnslag( nyttAnslag2021, rekkefolge = 1 )
-
-# Trenger anslaget for 2021
-nyttAnslag2021$giSumAnslag()
-
 nyttAnslag2022 <-
     navR::Anslag$new(
         name = "mars2022",
@@ -89,12 +52,6 @@ nyttAnslag2022 <-
         tiltak = (1 - 0.0147)
     )
 
-
-bud$leggTilNyttAnslag( nyttAnslag2022, rekkefolge = 2 )
-
-
-# Kan justeres etterhvert.
-#nyttAnslag2020$setVolum( volumvekst = 1.02)
 
 # Historiske anslag
 forrige2021 <-
@@ -119,55 +76,92 @@ aug2020_anslag2021 <-
         tiltak = (1 - 0.0225)
     )
 
-#
-forrige2021
-bud$leggTilHistoriskAnslag( forrige2021, rekkefolge = 1)
-bud$leggTilHistoriskAnslag( aug2020_anslag2021, rekkefolge = 2)
 
-# Se anslagene
-bud$giAnslag()
-bud$giAnslag()[[2]]
-bud$giHistoriskeAnslag()
-
-bud$giHistoriskeAnslag()[[1]]
-
-
-# Oppdater regnskapstabell, med anslag
-bud$lagRegnskapTabell2( anslag1 = bud$giAnslag()[[1]] ,
-                        anslag2 = bud$giAnslag()[[2]] ) %>%
-    mutate_at( vars( regnskap , endring_regnskap, regnskap_fast, endring_regnskap_f ), function(x) {x/10^6}
-               ) %>%
-    mutate_at( vars(regnskap,  regnskap_fast) , function(x) ifelse(.$kategori == "Anslag", round(x, -1), x))
-
-
-
-# Dekomponer, analyse mellom anslagene ------------------------------------
-
-# Beholder denne som egen
-bud$giAnslag()[[1]]$setPris( pris =  104514)
-bud$giHistoriskeAnslag()[[1]]$setPris( pris =  103586)
-bud$giHistoriskeAnslag()[[2]]$setPris( pris =   103072)
-
-Dekomponer$new( anslag1 = bud$giHistoriskeAnslag()[[1]], anslag2 = bud$giAnslag()[[1]],  antall_1 = 10216, antall_2 = 10295  )$giDf()
-Dekomponer$new( anslag1 = bud$giHistoriskeAnslag()[[1]], anslag2 = bud$giAnslag()[[1]],  antall_1 = 10216, antall_2 = 10295  )$giDekomponert()
-
-Dekomponer$new( anslag1 = bud$giHistoriskeAnslag()[[2]], anslag2 = bud$giAnslag()[[1]], sumAnslag1 =  1638.477*10^6 , antall_1 = 10045, antall_2 = 10295  )$giDf()
-Dekomponer$new( anslag1 = bud$giHistoriskeAnslag()[[2]], anslag2 = bud$giAnslag()[[1]], sumAnslag1 =  1638.477*10^6 , antall_1 = 10045, antall_2 = 10295  )$giDekomponert()
-
-
-
-# Tabeller til forsiden ---------------------------------------------------
-
-gj_ytelse_test <-
-    navR::AvgMottakereYtelse$new(
-        name = "test",
-        dfMottakere = mottakere,
-        dfRegnskap = regnskap,
-        gj_pris = 104716,
-        ANSLAG_AR = 2021,
-        ANSLAG_MND_PERIODE = 8
+nyttAnslag2023 <-
+    navR::Anslag$new(
+        name = "nytt2023",
+        ar = 2023,
+        # To måter å hente 2021-anslaget
+        regnskap_ifjor = nyttAnslag2021$giSumAnslag(),
+        volumvekst = (1 - 0.1000),
+        vekst_ytelse = (1 - 0.000),
+        prisvekst = 1.00,
+        tiltak = (1 - 0.0147)
     )
 
+# #
+# forrige2021
+# bud$leggTilHistoriskAnslag( forrige2021, rekkefolge = 1)
+# bud$leggTilHistoriskAnslag( aug2020_anslag2021, rekkefolge = 2)
+#
+# # Se anslagene
+# bud$giAnslag()
+# bud$giAnslag()[[2]]
+# bud$giHistoriskeAnslag()
+#
+# bud$giHistoriskeAnslag()[[1]]
+#
+#
+# # Oppdater regnskapstabell, med anslag
+# bud$lagRegnskapTabell2( anslag1 = bud$giAnslag()[[1]] ,
+#                         anslag2 = bud$giAnslag()[[2]] ) %>%
+#     mutate_at( vars( regnskap , endring_regnskap, regnskap_fast, endring_regnskap_f ), function(x) {x/10^6}
+#                ) %>%
+#     mutate_at( vars(regnskap,  regnskap_fast) , function(x) ifelse(.$kategori == "Anslag", round(x, -1), x))
+#
+#
+#
+# # Dekomponer, analyse mellom anslagene ------------------------------------
+#
+# # Beholder denne som egen
+# bud$giAnslag()[[1]]$setPris( pris =  104514)
+# bud$giHistoriskeAnslag()[[1]]$setPris( pris =  103586)
+# bud$giHistoriskeAnslag()[[2]]$setPris( pris =   103072)
+#
+# Dekomponer$new( anslag1 = bud$giHistoriskeAnslag()[[1]], anslag2 = bud$giAnslag()[[1]],  antall_1 = 10216, antall_2 = 10295  )$giDf()
+# Dekomponer$new( anslag1 = bud$giHistoriskeAnslag()[[1]], anslag2 = bud$giAnslag()[[1]],  antall_1 = 10216, antall_2 = 10295  )$giDekomponert()
+#
+# Dekomponer$new( anslag1 = bud$giHistoriskeAnslag()[[2]], anslag2 = bud$giAnslag()[[1]], sumAnslag1 =  1638.477*10^6 , antall_1 = 10045, antall_2 = 10295  )$giDf()
+# Dekomponer$new( anslag1 = bud$giHistoriskeAnslag()[[2]], anslag2 = bud$giAnslag()[[1]], sumAnslag1 =  1638.477*10^6 , antall_1 = 10045, antall_2 = 10295  )$giDekomponert()
+#
+#
+#
+# # Tabeller til forsiden ---------------------------------------------------
+#
+# gj_ytelse_test <-
+#     AvgMottakereYtelse$new(
+#         name = "test",
+#         dfMottakere = mottakere,
+#         dfRegnskap = regnskap,
+#         gj_pris = 104716,
+#         ANSLAG_AR = 2021,
+#         ANSLAG_MND_PERIODE = 8
+#     )
+#
+#
+#
+# gj_ytelse_test$lagTabell2(vector_anslag = list(nyttAnslag2021, nyttAnslag2022) )
+#
+# c(nyttAnslag2021, nyttAnslag2022)[[1]]$giAntallMottakere()
+#
+# gj_ytelse_test$lagTabell2( vector_anslag = c(nyttAnslag2021, nyttAnslag2022) )
+#
+#
 
-gj_ytelse_test$lagTabell()
+
+
+
+
+#
+#
+# lag_df_gj_ytelse( gj_ytelse_test$lagTabell(),
+#                   c(nyttAnslag2021, nyttAnslag2022)) %>% mutate( antall_endring = antall/lag(antall), ytelse_endring = ytelse/lag(ytelse) ) %>%
+#     mutate( navn = nyttAnslag2021$giAnslagNavn()) %>%
+#     select( navn, ar, antall, antall_endring, ytelse,ytelse_endring   ) %>%
+#     na.omit()
+#
+#
+#
+
+
 

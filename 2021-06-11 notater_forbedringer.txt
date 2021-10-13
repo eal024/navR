@@ -25,8 +25,9 @@ Forbedringer til programmet:
 
 3. Tabell Gj_ytelse:
     x- Viser gjennomsnittlig ytelse.
-    - Legge til anslag
+    v Legge til anslag
     - ceiling date
+    - forbedre for-loopen til map
 
 
 4. Budsjettdokumentet (template).
