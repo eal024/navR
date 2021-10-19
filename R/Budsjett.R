@@ -4,10 +4,21 @@ Budsjett <- R6::R6Class( "Budsjett",
 
                            public = list(
                                #library(tidyverse),
-                               initialize = function( name, name_nytt_anslag, periode, dfRegnskap, pris_gjeldende, dfMottakere, PRIS_VEKST, nyeAnslag = NULL, historiskeAnslag = NULL) {
+                               initialize = function( name,
+                                                      name_nytt_anslag,
+                                                      periode,
+                                                      dfRegnskap,
+                                                      pris_gjeldende,
+                                                      dfMottakere,
+                                                      PRIS_VEKST,
+                                                      nyeAnslag = NULL,
+                                                      historiskeAnslag = NULL,
+                                                      kapittelpost = NULL) {
 
                                ## Private variabler deklareres:
                                    private$name <- name;
+                                   private$kapittelpost <- kapittelpost;
+
                                    #private$name_nytt_anslag <- name_nytt_anslag
                                    private$ar <- stringr::str_sub( as.character(periode), start = 1, end = 4) %>% as.integer()
                                    private$mnd <- ifelse( nchar(periode) < 5, stringr::str_sub(periode, start = 6, end = 6), str_sub(periode, start = 5, end = 6)) %>% as.integer()
@@ -168,6 +179,14 @@ Budsjett <- R6::R6Class( "Budsjett",
                                },
 
 
+                               setKapittelpost = function( kapittelpost ) {
+
+                                   private$kapittelpost = kapittelpost
+                                   },
+
+                               giKapittelpost  = function( kapittelpost ) {return(private$kapittelpost) },
+
+
 
 
                                # # Nye anslag: Retur av liste og retur av df ----------------------------------------------
@@ -261,6 +280,7 @@ Budsjett <- R6::R6Class( "Budsjett",
                          # Private
                          private = list(name = NULL,
                                         name_nytt_anslag = NULL,
+                                        kapittelpost = NULL,
                                         ar = NULL,
                                         mnd = NULL,
                                         dfRegnskap = NULL,
