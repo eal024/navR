@@ -1,0 +1,268 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r echo = F }
+## Funksjon til denne delen: Peke på di ulike for å minske antall unike anslag. 
+
+regnskap_ifjor   <- bud_post1$giHistoriskeAnslag( )$Regnskap     
+vedtatt_iar      <- bud_post1$giHistoriskeAnslag( )$vedtatt_iar  
+forrige_iar      <- bud_post1$giHistoriskeAnslag( )$forrige_iar     
+nytt_iar         <- bud_post1$giHistoriskeAnslag( )$nytt_iar
+forrige_neste_ar <- bud_post1$giHistoriskeAnslag( )$forrige_neste_ar
+nytt_neste_ar    <- bud_post1$giHistoriskeAnslag( )$nytt_neste_ar
+
+
+  
+```
+
+
+
+```{r , echo = F , warning=F}
+
+a <-  list( ar = bud_post1$giPeriode() %>% year()      , regnskap_ifjor = regnskap_ifjor, vedtatt_iar = vedtatt_iar, forrige = forrige_iar, nyttt = nytt_iar )
+aa <- list( ar = (bud_post1$giPeriode() %>% year() + 1), regnskap_ifjor = NULL, vedtatt_iar = NULL, forrige = forrige_neste_ar, nyttt = nytt_neste_ar)
+
+#tabell_hoved3 <- map(ll, df_create3) %>% bind_rows() 
+tabell_hoved3 <- alt_creat(a, aa, navn_forste = "År")
+
+
+tabell_hoved3_2 <-  tabell_hoved3 %>% mutate(
+    `Endring fra vedtatt`     = str_remove(tabell_hoved3[[5]], pattern = " ") %>% as.numeric() -   str_remove(tabell_hoved3[[3]], pattern = " ") %>% as.numeric(),
+    `Endring fra forrige`     = str_remove(tabell_hoved3[[5]], pattern = " ") %>% as.numeric() -   str_remove(tabell_hoved3[[4]], pattern = " ") %>% as.numeric()
+  ) %>% 
+  mutate(across( .cols = everything(), .fns = function(x) ifelse( is.na(x), " ", x ) ))
+
+
+
+# Latex format - inn i funksjon?
+knitr::kable(format = "latex", 
+             booktabs = T  ,
+             escape = F    ,
+             tabell_hoved3_2 ,
+             digits = 0,
+             col.names = linebreak( c("",names(tabell_hoved3_2)[2:length(names(tabell_hoved3_2)) ]) ),
+             align = rep("r", times = 4)
+             ) %>% 
+  kableExtra::kable_styling( latex_options = c("HOLD_position","striped"), stripe_index =  c(1,3,5,7), font_size = 8, position = "left" ) 
+
+
+
+```
+
+
+
+```{r include=F}
+
+
+ar <- bud_post1$giPeriode() %>% year()
+nytt_i_ar <- navR::anslag_avrund( nytt_iar$giSumAnslag()/10^6 , i_mill_kr = T)
+
+endring_fra_forrige <- ( nytt_i_ar -  anslag_avrund(forrige_iar$giSumAnslag()/10^6, i_mill_kr = T ) )
+
+#
+#
+endring_tekst <- ifelse(endring_fra_forrige > 0, "høyere",   "lavere" ) 
+endring_fra_forrige_round <- round( endring_fra_forrige, digits = 1) 
+
+endring_fra_vedtatt <- ( (navR::anslag_avrund( nytt_iar$giSumAnslag(),i_mill_kr = F)  - navR::anslag_avrund(vedtatt_iar$giSumAnslag(), i_mill_kr = F) )/10^6 )
+endring_tekst_vedtatt <- ifelse(endring_fra_vedtatt > 0, "høyere", "lavere")
+
+tekst_vedtatt <- ifelse( abs(endring_fra_vedtatt) == 0 , " likt som", ifelse( endring_fra_vedtatt > 0, str_c(  abs(endring_fra_vedtatt)," mill.kr høyere enn "), str_c( abs(endring_fra_vedtatt),"  mill.kr lavere enn") ) )
+
+##
+tilsvarer_endring <- 
+  case_when( 
+    # Forrige anslag
+    abs(endring_fra_forrige) > 0  ~ paste0( endring_fra_forrige, " mill. kroner " ,endring_tekst, " enn forrige anslag og ", tekst_vedtatt, "  vedtatt budsjett."),
+    abs(endring_fra_forrige) == 0  ~ paste0("uendret fra forrige anslag."),
+    )
+  
+
+```
+
+
+Arbeids- og velferdsdirektoratet tilrår et anslag for `r ar` på `r format(nytt_i_ar, big.mark = " ") ` mill. kroner. Dette er `r tilsvarer_endring` 
+
+
+
+
+#### 1.1 Endringer og dekomponeringer av utgiftsanslaget$\\$ <br>$\\$ <br>
+__Endringer i `r nytt_iar$giAnslagNavn()` for `r nytt_iar$giAr()`  og `r nytt_neste_ar$giAr()` sammenlignet med forrige anslag:__
+
+`r nytt_iar$giAr()`:\newline
+*-* Endret volumvekst har medført  en anslagsendring for `r nytt_iar$giAr() ` på `r endring_anslag_iar_fra_sist$endring_mill[endring_anslag_iar_fra_sist$tekst == "endret volum"] %>% format(digits = 0)` mill. kroner.  
+*-* Endret underliggende utvilling pris har medført en anslagsendring  på `r endring_anslag_iar_fra_sist$endring_mill[endring_anslag_iar_fra_sist$tekst == "effekt av pris"]` mill. kroner.  
+*-* Endret underliggende utvilling i gjennomsnittlig ytelse har medført en anslagsendring  på `r endring_anslag_iar_fra_sist$endring_mill[endring_anslag_iar_fra_sist$tekst == "snitt_beløp"] %>%  format(digits = 0) ` mill. kroner.\newline 
+*-* Endret forutsetning for tiltak har medført en anslagsendring  på <Her skal det komme tekst>.\newline
+*-* Samlet anslagendring for `r nytt_iar$giAr() ` er `r endring_anslag_iar_fra_sist$endring_mill[endring_anslag_iar_fra_sist$tekst == "totalt"] %>% format(digits = 0)` mill. kroner.
+
+
+
+`r nytt_neste_ar$giAr()`:\newline
+*-* Endret volumvekst har medført en anslagsendring for `r nytt_neste_ar$giAr() ` på `r endring_anslag_neste_ar_fra_sist$endring_mill[endring_anslag_neste_ar_fra_sist$tekst == "endret volum"] %>% format(digits = 0)` mill. kroner.  
+*-* Endret underliggende utvilling pris har medført en anslagsendring  på `r endring_anslag_neste_ar_fra_sist$endring_mill[endring_anslag_neste_ar_fra_sist$tekst == "effekt av pris"]` mill. kroner.  
+*-* Endret underliggende utvilling i gjennomsnittlig ytelse har medført en anslagsendring  på `r endring_anslag_neste_ar_fra_sist$endring_mill[endring_anslag_neste_ar_fra_sist$tekst == "snitt_beløp"] %>%  format(digits = 0) ` mill. kroner.\newline 
+<!-- *-* Endret forutsetning for tiltak har medført en anslagsendring  på AUTO. -->
+*-* Samlet anslagendring for `r nytt_neste_ar$giAr() ` er `r endring_anslag_neste_ar_fra_sist$endring_mill[endring_anslag_neste_ar_fra_sist$tekst == "totalt"] %>% format(digits = 0)` mill. kroner.
+
+
+
+### 1.2 Regnskapsutvikling
+
+Tabell 2: Regnskapsutvikling.
+```{r , echo = F}
+
+# Denne må endre navn variabler
+
+tabell2_2 %>% 
+    mutate_all(linebreak) %>%
+    knitr::kable( format = "latex" , booktabs = T, escape = F, col.names = linebreak( names(tabell2_2) ), align = rep("r", times = 9) ) %>%  
+    kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11), font_size = 4 )  
+
+
+
+fra_i_fjor <- (nytt_iar$giSumAnslag()/10^6- tabell2$regnskap[tabell2$ar == "2020"])
+
+fra_i_fjor_i_tekst <- ifelse(fra_i_fjor > 0, "høyere", "lavere")
+
+
+```
+
+
+
+
+Her kan man bruke informasjon fra tabellen over. Eks. regnskapstallene for året `r nytt_iar$giAr()-1`  er  `r tabell2$regnskap[tabell2$ar == "2020"] %>% format(digits = 1)`,
+som er `r abs(fra_i_fjor) %>% format(digits = 1)` mill. kroner `r fra_i_fjor_i_tekst` enn anslag for 2021.
+
+
+Tabell 3: Regnskapstall basert på månedsutvikling, samme periode i fjor.
+
+```{r , echo = F, warning=F, error=F}
+
+
+tabell3 %>%
+    mutate_all(linebreak) %>%
+    kable(format = "latex", booktabs = T, escape = F,
+          col.names = linebreak( names(tabell3) ), align = "lccc" ) %>% 
+    kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11)  )  
+
+
+```
+
+
+
+Tabell 4: Antall mottakere basert på månedsutvikling, samme periode i fjor.
+```{r , echo = F, warning=F}
+
+
+tabell4_mnd_utvikling_mottakere_2 %>%
+    mutate_all(linebreak) %>%
+    kable(format = "latex", booktabs = T, escape = F,
+          col.names = linebreak( names(tabell4_mnd_utvikling_mottakere_2) ), align = "lccc" ) %>% 
+    kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11)  )  
+
+
+```
+
+
+
+### 1.3	Forutsetninger og anslag
+
+Tabell 5: Forutsetning anslag for `r bud_post1$giPeriode() %>% lubridate::year()`. 
+```{r,echo = F, warning=F}
+
+endre_tekst <- function( df) { df %>% mutate( tekst = case_when( str_detect(tekst, "regnskap")  ~ "Regnskap",
+                                                                 str_detect(tekst, "sum")  ~ "Sum",
+                                                                 T ~ tekst)) }
+
+tabell_forutsetning <- tibble( anslag = list( regnskap_ifjor,
+                                              vedtatt_iar,
+                                              nytt_iar) ) %>% 
+    mutate( anslag_navn = map(anslag, ~str_c(.x$giAnslagNavn()," ",.x$giAr() ) ) ) %>% 
+    mutate( anslag = map(anslag, ~endre_tekst(.x$giDfAnslag() )),
+            anslag = map(anslag, ~.x %>% mutate(prosent = ifelse( tekst == "Sum", as.numeric(prosent)*100, prosent),
+                                                tall = format( tall, big.mark = " ", digits = 0),
+                                                prosent = format( prosent, digits = 1)))
+    ) %>% 
+    unnest(cols = c(anslag_navn, anslag) ) %>%
+    pivot_wider( names_from = anslag_navn, values_from = c(prosent,tall) ) %>% 
+    select(tekst, 2,5,3,6, 4, 7)
+
+names(tabell_forutsetning) <- map_chr( names(tabell_forutsetning) , function(x)  str_replace(x, pattern = "_", "\n") %>% str_to_sentence( ))
+
+
+
+tabell_forutsetning %>%
+    mutate_all(linebreak) %>%
+    kable(format = "latex",
+          booktabs = T,
+          escape = F,
+          col.names = linebreak( names(tabell_forutsetning) ), align =  c("l", rep("r", times = 7) ) )  %>% 
+    kable_styling( position = "left",
+                   latex_options = c("HOLD_position", "striped", "scale_down"), stripe_index =  c(1,3,5,7), font_size = 6 ) 
+
+```
+
+
+\newpage
+Tabell 6: Forutsetning anslag for 2022.
+```{r, echo = F, warning=F }
+
+tabell_forutsetning_neste_ar <- tibble( anslag = list( forrige_neste_ar,
+                                                       nytt_neste_ar) ) %>%
+    mutate( anslag_navn = map(anslag, ~str_c( .x$giAnslagNavn() ) ) ) %>%
+    mutate( anslag = map(anslag, ~endre_tekst(.x$giDfAnslag() )),
+            anslag = map(anslag, ~.x %>% mutate(prosent = ifelse( tekst == "Sum", as.numeric(prosent)*100, prosent),
+                                                tall = format( tall, big.mark = " ", digits = 0),
+                                                prosent = format( prosent, digits = 1)))
+    ) %>%
+    unnest(cols = c(anslag_navn, anslag) ) %>%
+    pivot_wider( names_from = anslag_navn, values_from = c(prosent,tall) ) %>%
+    select(tekst, 2,4,3,5)
+
+names(tabell_forutsetning_neste_ar) <- map_chr( names(tabell_forutsetning_neste_ar) , function(x)  str_replace(x, pattern = "_", "\n") %>% str_to_sentence( ))
+
+
+
+tabell_forutsetning_neste_ar %>%
+    mutate_all(linebreak) %>%
+    kable(format = "latex",
+          booktabs = T,
+          escape = F,
+          col.names = linebreak( names(tabell_forutsetning_neste_ar) ), align = c("l", rep("r", times = 5) ) ) %>%
+    kable_styling( position = "left",
+                   latex_options = c("HOLD_position", "striped", "scale_down"), stripe_index =  c(1,3,5,7), font_size = 6 )
+
+
+```
+
+
+
+
+
+### 1.4	Gjennomsnittlig ytelse og antall mottakere
+
+Tabell 7: Antall mottakere og gjennomsnittlig ytelse.
+```{r, echo  = F}
+
+
+tabell5_gj_ytelse %>% 
+    kable(format = "latex",
+          booktabs = T,
+          escape = F,
+          align = rep("l", times = 6)) %>% 
+    kable_styling( position = "left",
+                   latex_options = c("HOLD_position", "striped" ), stripe_index =  c(1,3,5), font_size = 8
+                   )
+
+```
+
+
+
+
+
+
+

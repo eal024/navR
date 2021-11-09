@@ -1,0 +1,4 @@
+name: post_tekst
+description: >
+   Dokument hvor tekst til kapittelpost er lagret.
+create_dir: FALSE

@@ -1,4 +1,13 @@
 
+#' Budsjettobjektet.
+#'
+#' Hovedobjektet til budsjettdokumentet.
+#' Budsjett-objektet har metoder som lager tabeller, og gir navn i tabeller og tekst.
+#' Det skal være et budsjett-objekt for hver post.
+
+#' @param name Det lange og spesifiserte navnet paa anslaget.
+#' @param name_nytt_anslag kortnavnet eks. "oktober-anslaget"
+#' @param kapittelpost kapittel og post, format som 2620.70
 
 Budsjett <- R6::R6Class( "Budsjett",
 
@@ -13,7 +22,9 @@ Budsjett <- R6::R6Class( "Budsjett",
                                                       PRIS_VEKST,
                                                       nyeAnslag = NULL,
                                                       historiskeAnslag = NULL,
-                                                      kapittelpost = NULL) {
+                                                      kapittelpost = NULL,
+                                                      regnskap = NULL
+                                                      ) {
 
                                ## Private variabler deklareres:
                                    private$name <- name;
@@ -252,6 +263,13 @@ Budsjett <- R6::R6Class( "Budsjett",
 
                                    private$historiskeAnslag[[rekkefolge]] <- anslag
 
+                                   navn <- purrr::map_chr(private$historiskeAnslag, function(x)
+                                        if(is.null(x$giKortNavn())){ return(x$giAnslagNavn())} else{x$giKortNavn()}
+
+                                        )
+
+                                   private$historiskeAnslag <- set_names(private$historiskeAnslag, navn)
+
 
 
                                },
@@ -300,8 +318,12 @@ Budsjett <- R6::R6Class( "Budsjett",
                                         #nytt_anslag = NULL,
                                         #nytt_anslag_neste_ar = NULL,
                                         historiskeAnslag = NULL,
-                                        nyeAnslag = NULL
+                                        nyeAnslag = NULL,
+                                        regnskap = NULL
 
 
                          )
 )
+
+
+#' @export

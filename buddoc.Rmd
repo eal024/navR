@@ -1,0 +1,121 @@
+---
+title: "Kapittel 2620"
+author: "Test, flere kapitler, oktober-dokumentet"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: pdf_document
+editor_options:
+  chunk_output_type: console
+  
+  
+---
+
+```{r setup, include= FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.cap = "left")
+library(tidyverse)
+library(lubridate)
+library(navR)
+library(kableExtra)
+```
+
+```{r forutsetninger, include= F }
+
+## Forutsetninger. Skal inngå i budsjett-objektet og de ulike anslagene.
+
+g_ifjor    <- 100853
+g_iar      <- 104716
+g_neste_ar <- 108287
+
+```
+
+
+
+```{r child = c('post70.Rmd'), include=F}
+
+## Henter budsjett og anslag fra child-dokumenter.
+
+```
+
+
+## Arbeids- og velferdsdirektoratets tilrådning
+
+```{r utprint hovedtabell1, echo = F, warning= F }
+
+# Liste med anslag i år
+liste_hoved_1 <- list( post70 = list( post = bud_post1$giKapittelpost(), regnskap_ifjor = regnskap_ifjor, vedtatt_iar = vedtatt_iar, forrige = forrige_iar, nyttt = nytt_iar),
+                       post70 = list( post = bud_post1$giKapittelpost(), regnskap_ifjor = NULL          , vedtatt_iar = NULL, forrige = forrige_iar, nyttt = nytt_iar),
+                       post70 = list( post = bud_post1$giKapittelpost(), regnskap_ifjor = NULL          , vedtatt_iar = NULL, forrige = forrige_iar, nyttt = nytt_iar)
+              )
+
+
+# Lager hovedtabell
+tabell_hoved1 <- alt_creat2( liste_hoved_1, navn_forste = "Post")
+
+
+# Regner endring til nytt anslag: Gjør dette synlig.  
+`Endring fra forrige` <- as.numeric( str_remove_all(tabell_hoved1[[ncol(tabell_hoved1)]], pattern =  " ") ) - as.numeric( str_remove_all(tabell_hoved1[[(ncol(tabell_hoved1)-1)]], pattern =  " ") )
+`Endring fra vedtatt` <- as.numeric( str_remove_all(tabell_hoved1[[ncol(tabell_hoved1)]], pattern =  " ") ) - as.numeric( str_remove_all(tabell_hoved1[[(ncol(tabell_hoved1)-2)]], pattern =  " ") )
+
+
+# Tabell hoved med endring.
+tabell_hoved1 <- tabell_hoved1 %>%  
+  mutate( `Endring fra forrige` =  `Endring fra forrige`,
+          `Endring fra vedtatt` = `Endring fra vedtatt`
+          ) %>% 
+  mutate(across( .cols = everything(), .fns = function(x) ifelse( is.na(x), " ", x ) ))
+
+
+navR::latex_tabell(tabell_hoved1, size = 8)
+
+# Latex format
+# knitr::kable( booktabs = T, escape = F,tabell_hoved1, digits = 0,
+#              format = "latex",
+#              col.names = linebreak( names(tabell_hoved1) ),
+#              align = rep("r", times = 4)
+#              ) %>% 
+#   kableExtra::kable_styling( latex_options = c("HOLD_position","striped"), stripe_index =  c(1,3,5,7), font_size = 8, position = "left" ) 
+
+```
+
+
+\hspace{4cm}
+
+```{r utprint hovedtabell2 , echo = F, warning=F}
+
+# Liste anslag 2022
+liste_hoved2 <- list( post70  =  list(  ar = (bud_post1$giPeriode() %m+% years(1)) %>% year() ,regnskap = regnskap_ifjor, forrige = forrige_neste_ar, nytt = nytt_neste_ar),
+                      post70  =  list(  ar = (bud_post1$giPeriode() %m+% years(1)) %>% year() ,regnskap = NULL          , forrige = forrige_neste_ar, nytt = nytt_neste_ar),
+                      post70  =  list(  ar = (bud_post1$giPeriode() %m+% years(1)) %>% year() ,regnskap = NULL          , forrige = forrige_neste_ar, nytt = nytt_neste_ar)
+            )
+
+# Hovedtabellen
+tabell_hoved2 <- navR::alt_creat2( liste_hoved2, navn_forste = "År" )
+
+
+# Endring fra forrige
+`Endring fra forrige 2022` <- as.numeric( str_remove_all(tabell_hoved2[[ncol(tabell_hoved2)]], pattern =  " ") ) - as.numeric( str_remove_all(tabell_hoved2[[(ncol(tabell_hoved2)-1)]], pattern =  " ") )
+
+
+# Hovedtabell med endring
+tabell_hoved2 <- tabell_hoved2 %>% mutate( `Endring fra forrige 2022` = `Endring fra forrige 2022`) %>% select(-2)
+
+
+# Latex
+knitr::kable(format = "latex",
+             booktabs = T,
+             #escape = F,
+             tabell_hoved2,
+             digits = 0,
+             col.names = linebreak( names(tabell_hoved2) ),
+             align = rep("r", times = 4) ) %>%
+  kableExtra::kable_styling( latex_options = c("HOLD_position","striped"), stripe_index =  c(1,3,5,7), font_size = 8, position = "left" )
+
+```
+
+
+
+
+## Post 70 - beskrivelse av anslagene 
+```{r child = c('tekst_post70.Rmd')}
+
+```
+

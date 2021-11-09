@@ -8,6 +8,11 @@ Forbedringer til programmet:
     v byttet G benevning til pris
     - Tabell 1 underkapittel 1
     - Lagre navn på Post og navn post
+    - legg til summert samlet nederst i tabellene.
+
+
+1. Anslag
+    - Funksjon som tar inn antall mottakere
 
 
 1.1 Mottakertabell
@@ -27,6 +32,7 @@ Forbedringer til programmet:
 
 3. Tabell Gj_ytelse:
     x- Viser gjennomsnittlig ytelse.
+    - ser ut som tabellen regner feil. Dobbelsjkekk
     v Legge til anslag
     - ceiling date
     - forbedre for-loopen til map

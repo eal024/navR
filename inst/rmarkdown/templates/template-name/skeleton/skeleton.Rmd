@@ -27,9 +27,9 @@ regnskap <- navR::regnskap %>% filter( dato < lubridate::ymd("2021-10-01")) %>% 
 mottakere <- navR::mottakere %>% filter( dato < lubridate::ymd("2021-10-01"))%>% arrange( desc(dato))
 
 # Pris
-g_20 <- 100853
-g_21 <- 104716
-g_22 <- 108287
+g_ifjor    <- 100853
+g_iar      <- 104716
+g_neste_ar <- 108287
 
 
 ```

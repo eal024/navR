@@ -1,0 +1,262 @@
+
+
+
+
+
+
+
+
+
+
+```{r dataimport, include= F}
+
+# Regnskap
+regnskap <- navR::regnskap %>%
+  filter( dato < lubridate::ymd("2021-10-01")) %>%
+  arrange( desc(dato)) %>%
+  dplyr::rename( pris = g)
+
+
+# Mottakere
+mottakere <- navR::mottakere %>%
+  filter( dato < lubridate::ymd("2021-10-01")) %>%
+  arrange( desc(dato))
+
+ 
+```
+
+
+
+```{r}
+# Budsjettobjektet
+bud_post1 <- navR::Budsjett$new(name = "Kap.2620, post 70",
+                                kapittelpost = "2620.70",
+                                name_nytt_anslag = "Oktober 2021",
+                                periode = 202108,
+                                dfRegnskap = regnskap,
+                                dfMottakere =  mottakere %>% mutate(kategori = "post70"),
+                                pris_gjeldende = g_iar,
+                                PRIS_VEKST = (g_iar/g_ifjor)
+                          )
+
+
+
+```
+
+
+
+```{r anslag, include= F}
+# Regnskap
+regnskap_ifjor <- 
+  navR::Anslag$new(
+        name = str_c("Regnskap " ),
+        ar = lubridate::year(bud_post1$giPeriode())-1,
+        regnskap_ifjor = bud_post1$giRegnskapstall( ar_til_bake = 2),
+        volumvekst = (1 - 0.029),
+        vekst_ytelse = (1-0.014),
+        prisvekst = 1.020,
+        tiltak = (1 - 0.0),
+        kortnavn = "Regnskap"
+    )
+
+
+forrige_iar <-
+    navR::Anslag$new(
+        name = "Anslag fra 21.7.21",
+        ar = 2021,
+        regnskap_ifjor = bud_post1$giRegnskapstallIfjor(),
+        volumvekst = (1 - 0.10),
+        vekst_ytelse = (1-0.015),
+        prisvekst = 1.0383,
+        tiltak = (1 - 0.0223),
+        kortnavn = "forrige_iar"
+    )
+
+vedtatt_iar <-
+    navR::Anslag$new(
+        name = "Anslag fra 21.3.21",
+        ar = 2021,
+        regnskap_ifjor = bud_post1$giRegnskapstallIfjor(),
+        volumvekst = (1 + 0.0069),
+        vekst_ytelse = (1-0.005),
+        prisvekst = 1.0393,
+        tiltak = (1 - 0.02187),
+        kortnavn =  "vedtatt_iar"
+    )
+
+nytt_iar <-
+    navR::Anslag$new(
+        name = "NAVs nye anslag",
+        ar = 2021, #(bud$giAr()+1)
+        regnskap_ifjor = bud_post1$giRegnskapstallIfjor(),
+        volumvekst = (1 + 0.015),
+        vekst_ytelse = (1-0.026),
+        prisvekst = 1.0383,
+        tiltak = (1 - 0.0221),
+        kortnavn =  "nytt_iar"
+    )
+
+nytt_neste_ar <-
+    navR::Anslag$new(
+        name = "NAVs nye anslag 2022",
+        ar = 2022,
+        regnskap_ifjor = nytt_iar$giSumAnslag(),
+        volumvekst = (1 - 0.005),
+        vekst_ytelse = (1-0.00),
+        prisvekst = 1.0341,
+        tiltak = (1 - 0.0145),
+        kortnavn =  "nytt_neste_ar" 
+    )
+
+forrige_neste_ar <-
+    navR::Anslag$new(
+        name = "NAVs forrige anslag for 2022",
+        ar = 2022,
+        regnskap_ifjor = forrige_iar$giSumAnslag(),
+        volumvekst = (1 - 0.0),
+        vekst_ytelse = (1-0.00),
+        prisvekst = 1.0341,
+        tiltak = (1 - 0.0145),
+        kortnavn =  "forrige_neste_ar"
+        
+    )
+
+
+```
+
+
+```{r anslag_peker}
+
+# Bør endre navn til "anslagsliste"
+bud_post1$leggTilHistoriskAnslag( anslag = regnskap_ifjor, 1 )
+bud_post1$leggTilHistoriskAnslag( anslag = vedtatt_iar, 2 )
+bud_post1$leggTilHistoriskAnslag( anslag = nytt_iar, 3 )
+bud_post1$leggTilHistoriskAnslag( anslag = forrige_neste_ar, 4 )
+bud_post1$leggTilHistoriskAnslag( anslag = nytt_neste_ar, 5 )
+bud_post1$leggTilHistoriskAnslag( anslag = forrige_iar, 6 )
+
+
+
+```
+
+
+
+
+```{r echo = F}
+tabell2 <- bud_post1$lagRegnskapTabell2( anslag1 = nytt_iar ,
+                                   anslag2 = nytt_neste_ar,
+                                   printversjon = F)  %>% 
+    mutate_at( vars( regnskap ,endring_regnskap,  regnskap_fast, endring_regnskap_f) , function(x) x/10^6) %>% 
+    mutate_at( vars(regnskap,  regnskap_fast) , function(x) ifelse(.$kategori == "Anslag", round(x, -1), x))
+
+
+tabell2_2 <- bud_post1$lagRegnskapTabell2( anslag1 = nytt_iar ,
+                                   anslag2 = nytt_neste_ar,
+                                   printversjon = T)  %>% 
+    mutate_at( vars(regnskap,  regnskap_fast) , function(x) ifelse(.$kategori == "Anslag", round(as.numeric(x), -1), x))
+
+names( tabell2_2 ) <- c(names(tabell2)[1:3], "Endring", "Vekst\npst", "Pris", paste0("Mill. kr\n","2021-G"), "Endring\nregnskap fast", "vekst faste kr\npst") 
+
+```
+
+
+
+```{r utregning tabell3, echo = F}
+
+tabell3 <- bud_post1$lagTabellMndUtviklingRegnskap()
+
+
+tabell3 <- tabell3 %>%
+    ungroup() %>% 
+    mutate_if( is.numeric, function(x) ifelse( abs(x) > 1, round(x/10^6, digits = 0) %>% format( big.mark = " "), round(x, digits = 4 )*100 )) %>% 
+    select(-forrige, -naa) 
+
+# Legg til år
+names(tabell3) <- c(
+    str_c("Periode\nFra og med – til og med"),
+    str_c("Prosentvis vekst i \nregnskapstallene målt i fast G"),
+    str_c( "Budsjettanslag for ", "2021", " basert på\ntilsvarende vekst. Mill. kroner"),
+    str_c( "Budsjettanslag for ", "2022", " basert på\ntilsvarende vekst. Mill. kroner")
+)
+
+
+
+```
+
+
+```{r tabeller_ant_mottakere_gj_ytelse, echo = F}
+
+
+
+tabell4_mnd_utvikling_mottakere <- bud_post1$lagTabellMndUtviklingMottakere() %>% ungroup()
+
+tabell4_mnd_utvikling_mottakere_2 <-tabell4_mnd_utvikling_mottakere %>%
+    mutate_if( is.numeric, function(x) ifelse( abs(x) > 1, round(x/1, digits = 0) %>% format( big.mark = " "), round(x, digits = 4 )*100 )) %>% 
+    select(-forrige, -naa)
+
+names(tabell4_mnd_utvikling_mottakere_2) <- c(
+    str_c("Periode\nFra og med – til og med"),
+    str_c("Prosentvis vekst i antall\nmottakere"),
+    str_c( "Mottakere ", bud_post1$giPeriode() %>% year()     ," basert\npå tilsvarende vekst"),
+    str_c( "Mottakere ", (bud_post1$giPeriode() %>% year()+1 )," basert\npå tilsvarende vekst") )
+
+
+gj_ytelse <-
+    navR::AvgMottakereYtelse$new(
+        name = "test",
+        dfMottakere = mottakere,
+        dfRegnskap = regnskap ,
+        gj_pris = g_iar,
+        ANSLAG_AR = bud_post1$giPeriode() %>% lubridate::year(),
+        ANSLAG_MND_PERIODE = bud_post1$giPeriode() %>% lubridate::month()
+    )
+
+tabell5_gj_ytelse <- gj_ytelse$lagTabell2( nested_liste_anslag = list( anslag =  c(nytt_iar, nytt_neste_ar), Forrige = c(forrige_iar, forrige_neste_ar))) %>% 
+  mutate_if( is.numeric, function(x) ifelse( abs(x) > 1, round(x/1, digits = 0) %>% format( big.mark = " "), round(x, digits = 4 )*100 )) %>% 
+  rename(
+    `År` = ar, 
+    Antall = antall, 
+    Endring = antall_endring,
+    `Gj.ytelse` = ytelse,
+    `Endring ytelse` = ytelse_endring
+  )
+
+
+
+```
+
+
+
+```{r dekomponering, include=F}
+
+## Må defenere gjeldende pris 
+forrige_iar$setPris( pris = g_iar)
+nytt_iar$setPris( pris = g_iar)
+
+
+forrige_neste_ar$setPris( pris =  108182)
+nytt_neste_ar$setPris( pris = 108182)
+
+# Må spesifisere antall mottakere
+endring_anslag_iar_fra_sist <- navR::Dekomponer$new( anslag1 = forrige_iar, anslag2 = nytt_iar,  antall_1 = 10223 , antall_2 = 10327  )$giDekomponert()
+
+
+# Må spesifisere antall mottakere
+endring_anslag_neste_ar_fra_sist <- navR::Dekomponer$new( anslag1 = forrige_neste_ar,
+                                                     anslag2 = nytt_neste_ar,
+                                                     antall_1 = 10066 ,
+                                                     antall_2 = 10119  )$giDekomponert()
+
+
+
+```
+
+
+
+
+
+
+
+
+
+

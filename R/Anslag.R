@@ -12,7 +12,8 @@ Anslag <- R6::R6Class( "Anslag",
                                                   prisvekst = NULL,
                                                   volumvekst = NULL,
                                                   tiltak = NULL,
-                                                  underregulering = NULL) {
+                                                  underregulering = NULL,
+                                                  kortnavn = NULL) {
 
                                # Private forutsetninger omgjøres til 1 om ingen input.
                                private$name <- name
@@ -22,7 +23,8 @@ Anslag <- R6::R6Class( "Anslag",
                                private$vekst_ytelse <- ifelse( is.null(vekst_ytelse) , 1, vekst_ytelse)
                                private$volumvekst <- ifelse( is.null(volumvekst), 1, volumvekst)
                                private$tiltak <- ifelse( is.null(tiltak), 1 , tiltak )
-                               private$underregulering <-  ifelse( is.null(underregulering), 1 , underregulering )
+                               private$underregulering <-  ifelse( is.null(underregulering), 1 , underregulering)
+                               private$kortnavn <- kortnavn
 
                                # Forutsetninger i tall.
                                volumvekst       <- private$regnskap_ifjor  *( private$volumvekst-1);
@@ -178,6 +180,8 @@ Anslag <- R6::R6Class( "Anslag",
 
                            giPris = function( ) { private$pris},
 
+                           giKortNavn = function( ) {return(private$kortnavn)},
+
 
                            # Print
                            print = function(...){
@@ -215,7 +219,8 @@ Anslag <- R6::R6Class( "Anslag",
                            # Anslaget
                            anslag_tall = NULL,
                            anslag_antall = NULL,
-                           DFAnslag = NULL
+                           DFAnslag = NULL,
+                           kortnavn = NULL
 
                        )
 )
