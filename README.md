@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-Målet med navR er i hovedsak for å tilrettelegge arbeidet med budsjett
+Målet med navR er i hovedsak å tilrettelegge arbeidet med budsjett
 anslaget i R.
 
 ## Installasjon
