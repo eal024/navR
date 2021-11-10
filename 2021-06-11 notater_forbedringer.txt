@@ -2,6 +2,10 @@
 
 Forbedringer til programmet:
 
+X. Metadata
+    - param tidsperiode.
+
+
 0. budsjett
     - giregnskapifjor -> må ha en funksjon som henter ut regnskapstall for det gitte året.
     - (Regnskap mnd-utvikling) Mulighet til å legge til tiltakseffekt regnskap

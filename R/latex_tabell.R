@@ -5,12 +5,16 @@
 ## Latex utprint
 
 
-latex_tabell  <- function( tabell, size, position = "left" ) {
+latex_tabell  <- function( tabell, size, position = "left", linebreak = F ) {
 
     tabell_strip <- 1:nrow(tabell)
     tabell_strip <- tabell_strip[tabell_strip %% 2 == 1]
 
-    knitr::kable( x = tabell,
+    # Hvis en skal ha linjebrudd.
+    if( linebreak == T) { tabell <- mutate_all(tabell, linebreak ) }
+
+
+        knitr::kable( x = tabell,
                   booktabs = T, escape = F, digits = 0,
                   format = "latex",
                   col.names  = linebreak( names(tabell) ),
