@@ -39,7 +39,7 @@ g_neste_ar <- 108287
 
 ```
 
-
+## Arbeids- og velferdsdirektoratets tilrådning
 
 ```{r hovedtabell1, echo= FALSE, warning= F }
 
@@ -71,22 +71,38 @@ navR::latex_tabell(tabell_hoved1, size = 8)
 
 ```
 
+\hspace{4cm}
 
-```{r hovedtabell2, echo= FALSE}
+```{r utprint hovedtabell2 , echo = F, warning=F }
 
+# Liste anslag 2022
+liste_hoved2 <- list( post70  =  list(  ar = (bud_post1$giPeriode() %m+% years(1)) %>% year() ,regnskap = regnskap_ifjor, forrige = forrige_neste_ar, nytt = nytt_neste_ar),
+                      post70  =  list(  ar = (bud_post1$giPeriode() %m+% years(1)) %>% year() ,regnskap = NULL          , forrige = forrige_neste_ar, nytt = nytt_neste_ar),
+                      post70  =  list(  ar = (bud_post1$giPeriode() %m+% years(1)) %>% year() ,regnskap = NULL          , forrige = forrige_neste_ar, nytt = nytt_neste_ar)
+            )
+
+# Hovedtabellen
+tabell_hoved2 <- navR::alt_creat2( liste_hoved2, navn_forste = "År" )
+
+
+# Endring fra forrige
+`Endring fra forrige 2022` <- as.numeric( str_remove_all(tabell_hoved2[[ncol(tabell_hoved2)]], pattern =  " ") ) - as.numeric( str_remove_all(tabell_hoved2[[(ncol(tabell_hoved2)-1)]], pattern =  " ") )
+
+
+# Hovedtabell med endring
+tabell_hoved2 <- tabell_hoved2 %>% mutate( `Endring fra forrige 2022` = `Endring fra forrige 2022`) %>% select(-2)
+
+
+# Latex
+navR::latex_tabell( tabell_hoved2, size = 8)
 ```
 
 
-## Arbeids- og velferdsdirektoratets tilrådning
 
+```{r child = c('tekst_post70.Rmd'), include= F}
 
-
-
-```{r utregning tabell1, echo = F}
-
-
+## Her kommer de ulike budsjettpostene. 
 
 
 ```
-
 

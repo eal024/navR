@@ -113,9 +113,10 @@ knitr::kable(format = "latex",
 
 
 
+```{r child = c('tekst_post70.Rmd'), include= F}
 
-## Post 70 - beskrivelse av anslagene 
-```{r child = c('tekst_post70.Rmd')}
+## Her kommer de ulike budsjettpostene. 
+
 
 ```
 
