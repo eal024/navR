@@ -1,5 +1,7 @@
 ---
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -18,43 +20,66 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of navR is to ...
+Målet med navR er i hovedsak for å tilrettelegge arbeidet med budsjett anslaget i R. 
 
-## Installation
+## Installasjon
 
-You can install the released version of navR from [CRAN](https://CRAN.R-project.org) with:
+Installer navR fra [GitHub](https://github.com/) ved:
 
-``` r
-install.packages("navR")
-```
-
-And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("eal024/navR")
 ```
-## Example
+## Eksempel
 
-This is a basic example which shows you how to solve a common problem:
+Et enkelt eksempel på hvordan bruke navR:  
 
-```{r example}
+```{r example, echo = F, include= F}
 library(navR)
+library(tidyverse)
+library(lubridate)
 ## basic example code
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+
 
 ```{r cars}
-summary(cars)
+tabell <- navR::RegnskapTabell$new(
+    dfRegnskap = navR::regnskap %>% filter(dato < ymd("2020-08-01")) %>% rename( pris = g),
+    pris_gjeldende = 100000,
+    anslag_ar = 2020,
+    anslag_mnd_periode = 08
+)
+
+
+regnskapstabell <- tabell$lagRegnskapTabell(celing_date = T) %>%
+    mutate(across(
+        .cols = c(regnskap, endring_regnskap, regnskap_fast, endring_regnskap_f),
+        .fns = function(x) x / 10 ^ 6 ) 
+    )
+
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
 
-You can also embed plots, for example:
+```{r }
+library(kableExtra)
 
-```{r pressure, echo = FALSE}
-plot(pressure)
+navR::latex_tabell(regnskapstabell, size = 6)
+
+knitr::kable(regnskapstabell)
+
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+
+
+```{r pressure, echo = FALSE, include= F}
+
+# You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
+# 
+# You can also embed plots, for example:
+# ##
+
+```
+
+

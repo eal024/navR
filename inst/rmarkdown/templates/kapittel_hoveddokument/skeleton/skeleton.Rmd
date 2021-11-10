@@ -15,7 +15,7 @@ library(navR)
 library(kableExtra)
 ```
 
-```{r forutsetninger}
+```{r forutsetninger, include= F, echo = F}
 
 ## Forutsetninger. Skal inngå i budsjett-objektet og de ulike anslagene.
 
@@ -49,7 +49,9 @@ liste_hoved_1 <- list( post70 = list( post = bud_post1$giKapittelpost(), regnska
                        #post70 = list( post = bud_post1$giKapittelpost(), regnskap_ifjor = NULL          , vedtatt_iar = NULL, forrige = forrige_iar, nyttt = nytt_iar)
                       ) %>% 
     # Omgjør liste til tabell 
-    alt_creat2( liste_hoved_1, navn_forste = "Post")
+    alt_creat2(  navn_forste = "Post")
+
+tabell_hoved1 <- alt_creat2(liste_hoved_1,  navn_forste = "Post")
 
 # Manuell utregning av "Endring fra forrige" og fra "vedtatt"  
 `Endring fra forrige` <- as.numeric( str_remove_all(tabell_hoved1[[ncol(tabell_hoved1)]], pattern =  " ") ) - as.numeric( str_remove_all(tabell_hoved1[[(ncol(tabell_hoved1)-1)]], pattern =  " ") )
