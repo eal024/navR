@@ -6,8 +6,8 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-Målet med navR er i hovedsak å tilrettelegge arbeidet med budsjett
-anslaget i R.
+Målet med navR er i hovedsak å tilrettelegge arbeidet med
+budsjettanslaget til folketrygde i verktøyet R.
 
 ## Installasjon
 
