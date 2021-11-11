@@ -142,13 +142,7 @@ Tabell 3: Regnskapstall basert på månedsutvikling, samme periode i fjor.
 
 ```{r , echo = F, warning=F, error=F}
 
-
-tabell3 %>%
-    mutate_all(linebreak) %>%
-    kable(format = "latex", booktabs = T, escape = F,
-          col.names = linebreak( names(tabell3) ), align = "lccc" ) %>% 
-    kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11)  )  
-
+tabell3 %>% navR::latex_tabell( size = 5)
 
 ```
 
@@ -174,6 +168,7 @@ tabell4_mnd_utvikling_mottakere_2 %>%
 Tabell 5: Forutsetning anslag for `r bud_post1$giPeriode() %>% lubridate::year()`. 
 ```{r,echo = F, warning=F}
 
+
 endre_tekst <- function( df) { df %>% mutate( tekst = case_when( str_detect(tekst, "regnskap")  ~ "Regnskap",
                                                                  str_detect(tekst, "sum")  ~ "Sum",
                                                                  T ~ tekst)) }
@@ -195,14 +190,7 @@ names(tabell_forutsetning) <- map_chr( names(tabell_forutsetning) , function(x) 
 
 
 
-tabell_forutsetning %>%
-    mutate_all(linebreak) %>%
-    kable(format = "latex",
-          booktabs = T,
-          escape = F,
-          col.names = linebreak( names(tabell_forutsetning) ), align =  c("l", rep("r", times = 7) ) )  %>% 
-    kable_styling( position = "left",
-                   latex_options = c("HOLD_position", "striped", "scale_down"), stripe_index =  c(1,3,5,7), font_size = 6 ) 
+tabell_forutsetning %>% navR::latex_tabell( size = 6)
 
 ```
 
@@ -227,15 +215,7 @@ names(tabell_forutsetning_neste_ar) <- map_chr( names(tabell_forutsetning_neste_
 
 
 
-tabell_forutsetning_neste_ar %>%
-    mutate_all(linebreak) %>%
-    kable(format = "latex",
-          booktabs = T,
-          escape = F,
-          col.names = linebreak( names(tabell_forutsetning_neste_ar) ), align = c("l", rep("r", times = 5) ) ) %>%
-    kable_styling( position = "left",
-                   latex_options = c("HOLD_position", "striped", "scale_down"), stripe_index =  c(1,3,5,7), font_size = 6 )
-
+tabell_forutsetning_neste_ar %>% navR::latex_tabell( size = 6)
 
 ```
 
@@ -249,14 +229,8 @@ Tabell 7: Antall mottakere og gjennomsnittlig ytelse.
 ```{r, echo  = F}
 
 
-tabell5_gj_ytelse %>% 
-    kable(format = "latex",
-          booktabs = T,
-          escape = F,
-          align = rep("l", times = 6)) %>% 
-    kable_styling( position = "left",
-                   latex_options = c("HOLD_position", "striped" ), stripe_index =  c(1,3,5), font_size = 8
-                   )
+tabell5_gj_ytelse %>% navR::latex_tabell( size = 8)
+
 
 ```
 

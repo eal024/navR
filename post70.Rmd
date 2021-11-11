@@ -4,6 +4,20 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r backup, include= F }
+library(tidyverse)
+library(lubridate)
+library(navR)
+library(kableExtra)
+
+## Forutsetninger. Skal inngå i budsjett-objektet og de ulike anslagene.
+
+g_ifjor    <- 100853
+g_iar      <- 104716
+g_neste_ar <- 108287
+
+```
+
 
 
 

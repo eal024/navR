@@ -99,6 +99,8 @@ tabell_hoved2 <- navR::alt_creat2( liste_hoved2, navn_forste = "År" )
 tabell_hoved2 <- tabell_hoved2 %>% mutate( `Endring fra forrige 2022` = `Endring fra forrige 2022`) %>% select(-2)
 
 
+# 
+
 # Latex
 knitr::kable(format = "latex",
              booktabs = T,
@@ -113,7 +115,7 @@ knitr::kable(format = "latex",
 
 
 
-```{r child = c('tekst_post70.Rmd'), include= F}
+```{r child = c('tekst_post70.Rmd'), echo = F}
 
 ## Her kommer de ulike budsjettpostene. 
 

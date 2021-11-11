@@ -120,18 +120,59 @@ __Endringer i `r nytt_iar$giAnslagNavn()` for `r nytt_iar$giAr()`  og `r nytt_ne
 
 
 
+```{r ,echo = F}
+
+# 
+fra_i_fjor <- (nytt_iar$giSumAnslag()/10^6- tabell2$regnskap[tabell2$ar == "2020"])
+
+#fra_i_fjor_i_tekst <- ifelse(fra_i_fjor > 0, "høyere", "lavere")
+
+  ## Sammesatt 3 ulike utfall.
+fra_i_fjor_i_tekst <- 
+  case_when( 
+    # Forrige anslag
+    fra_i_fjor > 0  ~ paste0("høyere enn anslaget for ", nytt_iar$giAr() ),
+    fra_i_fjor < 0  ~ paste0("lavere enn anslaget for ", nytt_iar$giAr() ),
+    T ~  paste0(" fra anslaget for ", nytt_iar$giAr())
+    )
 
 
 
 
+tabell_2_2 %>% navR::latex_tabell( size = 4)
+
+
+```
+
+
+Her kan man bruke informasjon fra tabellen over. Eks. regnskapstallene for året `r nytt_iar$giAr()-1`  er  `r tabell2$regnskap[tabell2$ar == "2020"] %>% format(digits = 1)`,
+som er `r abs(fra_i_fjor) %>% format(digits = 1)` mill. kroner `r fra_i_fjor_i_tekst`.
+
+
+Tabell 3: Regnskapstall basert på månedsutvikling, samme periode i fjor.
+
+```{r , echo = F, warning=F, error=F}
+
+tabell3 %>% navR::latex_tabell( size = 5)
+
+```
 
 
 
+Tabell 4: Antall mottakere basert på månedsutvikling, samme periode i fjor.
+```{r , echo = F, warning=F}
 
 
+# # Ulik latex_option. "scale_down" bruker ikke font_size 
+
+tabell4_mnd_utvikling_mottakere_2 %>% 
+    mutate_all(linebreak) %>%
+    kable(format = "latex", booktabs = T, escape = F,
+          col.names = linebreak( names(tabell4_mnd_utvikling_mottakere_2) ), align = "lccc" ) %>% 
+    kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11)  )  
 
 
-
+```
 
 
 
