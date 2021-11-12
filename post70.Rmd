@@ -22,7 +22,6 @@ g_neste_ar <- 108287
 
 
 
-
 ```{r data, include= F}
 
 # Data 
@@ -37,6 +36,8 @@ mottakere <- navR::mottakere %>%
 
  
 ```
+
+
 
 
 

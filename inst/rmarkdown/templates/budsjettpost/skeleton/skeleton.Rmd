@@ -6,37 +6,58 @@
 
 
 
+```{r, include = F}
+ 
+#navR::create_wdir( )
+
+```
 
 
 ```{r dataimport, include= F}
 
+
 # Regnskap
-regnskap <- navR::regnskap %>%
-  filter( dato < lubridate::ymd("2021-10-01")) %>%
-  arrange( desc(dato)) %>%
-  dplyr::rename( pris = g)
+#regnskap <- readxl::read_excel("data/regnskap_post1.xlsx")
+# Eksempeldata:
+# regnskap <- navR::regnskap %>%
+#   filter( dato < lubridate::ymd("2021-10-01")) %>%
+#   arrange( desc(dato)) %>%
+#   dplyr::rename( pris = g)
 
 
 # Mottakere
-mottakere <- navR::mottakere %>%
-  filter( dato < lubridate::ymd("2021-10-01")) %>%
-  arrange( desc(dato))
+#mottakere <- readxl::read_excel("data/mottakere_post1.xlsx")
+# Eksempeldata:
+# mottakere <- navR::mottakere %>%
+#   filter( dato < lubridate::ymd("2021-10-01")) %>%
+#   arrange( desc(dato))
 
- 
+
+## Tiltak
+# tiltak <- readxl::read_excel("data/tiltak.xlsx")
+# Eksempeldata:
+# tiltak <- tibble( ar = 2021:2023) %>% 
+#   expand_grid( tiltak = c("tiltak 1", "tiltak 2", "tiltak 3" ), sum = c(1) ) %>% 
+#   pivot_wider(  names_from = ar, values_from = sum ) %>% 
+#   rowwise() %>% 
+#   mutate( helarseffekt = 3)
+
+
+
 ```
 
 
 
 ```{r}
 # Budsjettobjektet
-bud_post1 <- navR::Budsjett$new(name = "Kap.2620, post 70",
-                                kapittelpost = "2620.70",
-                                name_nytt_anslag = "Oktober 2021",
-                                periode = 202108,
-                                dfRegnskap = regnskap,
-                                dfMottakere =  mottakere %>% mutate(kategori = "post70"),
-                                pris_gjeldende = g_iar,
-                                PRIS_VEKST = (g_iar/g_ifjor)
+bud_post1 <- navR::Budsjett$new(name =    ,#Eksemepl: "Kap.2620, post 70",
+                                kapittelpost =    ,#Eksemepl: "2620.70",
+                                name_nytt_anslag =  #"Oktober 2021",
+                                periode = #202108,
+                                dfRegnskap = #regnskap,
+                                dfMottakere =  #mottakere %>% mutate(kategori = "post70"),
+                                pris_gjeldende = #g_iar,
+                                PRIS_VEKST = #(g_iar/g_ifjor)
                           )
 
 
