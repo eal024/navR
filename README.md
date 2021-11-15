@@ -3,7 +3,8 @@
 
 # navR
 
-badges: start ![navR](inst/figures/logo_navR.png) badges: end
+<img src="inst/figures/logo_navR.png" width="150" height="150" />
+![navR](inst/figures/logo_navR.png)
 
 Målet med navR er i hovedsak å tilrettelegge arbeidet med
 budsjettanslaget til folketrygde i verktøyet R.
