@@ -43,7 +43,7 @@ mottakere <- navR::mottakere %>%
 
 ```{r include= F}
 # Budsjettobjektet
-bud_post1 <- navR::Budsjett$new(name = "Kap. 2020 Enslig mor eller far",
+bud_post1 <- Budsjett$new(name = "Kap. 2020 Enslig mor eller far",
                                 kapittelpost = "2620.70",
                                 name_nytt_anslag = "Oktober 2021",
                                 periode = 202108,
