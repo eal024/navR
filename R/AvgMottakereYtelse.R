@@ -92,9 +92,9 @@ AvgMottakereYtelse <- R6::R6Class( "Gjennomsnittlig antall mottakere og gjennoms
                               lagTabell2 = function( nested_liste_anslag ) {
 
                                   l <- nested_liste_anslag
-
+#
                                   df_liste <- vector(mode = "list" )
-
+#
                                   for( i in 1:length(l) ){
 
                                       df_liste[[names(l)[i]]] <- gj_ytelse_anslag( tabell  = self$lagTabell(),
@@ -106,8 +106,11 @@ AvgMottakereYtelse <- R6::R6Class( "Gjennomsnittlig antall mottakere og gjennoms
                                   }
 
 
-                                  bind_rows( self$lagTabell() %>% dplyr::mutate( navn = "Faktisk" ),
-                                             bind_rows( df_liste ) %>% dplyr::mutate( ar = as.character(ar)) ) %>%
+                                  bind_rows(
+
+                                      self$lagTabell() %>% dplyr::mutate( navn = "Faktisk" ),
+
+                                      dplyr::bind_rows( df_liste ) %>% dplyr::mutate( ar = as.character(ar)) ) %>%
                                       dplyr::relocate( navn, .before = ar)
 
 
@@ -116,7 +119,7 @@ AvgMottakereYtelse <- R6::R6Class( "Gjennomsnittlig antall mottakere og gjennoms
 
                               # Print
                               print = function(...){
-                                  cat("Dette printes ut:", private$name,"\n");}
+                                  cat("Dette printes ut:", private$name,"og legger til\n");}
                           ),
                               # Private
                           private = list(

@@ -195,8 +195,8 @@ tabell_forutsetning <- tibble( anslag = list( regnskap_ifjor,
                                               vedtatt_iar,
                                               nytt_iar) ) %>% 
     mutate( anslag_navn = map(anslag, ~str_c(.x$giAnslagNavn()," ",.x$giAr() ) ) ) %>% 
-    mutate( anslag = map(anslag, ~endre_tekst(.x$giDfAnslag() )),
-            anslag = map(anslag, ~.x %>% mutate(prosent = ifelse( tekst == "Sum", as.numeric(prosent)*100, prosent),
+    mutate( anslag      = map(anslag, ~endre_tekst(.x$giDfAnslag() )),
+            anslag      = map(anslag, ~.x %>% mutate(prosent = ifelse( tekst == "Sum", as.numeric(prosent)*100, prosent),
                                                 tall = format( tall, big.mark = " ", digits = 0),
                                                 prosent = format( prosent, digits = 1)))
     ) %>% 

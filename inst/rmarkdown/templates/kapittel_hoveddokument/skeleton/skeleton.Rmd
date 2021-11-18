@@ -99,7 +99,7 @@ navR::latex_tabell( tabell_hoved2, size = 8)
 
 
 
-```{r child = c('tekst_post70.Rmd'), include= F}
+```{r child = c('tekst_post70.Rmd'), echo = T}
 
 ## Her kommer de ulike budsjettpostene. 
 
