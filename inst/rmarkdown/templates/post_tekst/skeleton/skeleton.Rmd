@@ -16,7 +16,7 @@ nytt_iar         <- bud_post1$giHistoriskeAnslag( )$nytt_iar
 forrige_neste_ar <- bud_post1$giHistoriskeAnslag( )$forrige_neste_ar
 nytt_neste_ar    <- bud_post1$giHistoriskeAnslag( )$nytt_neste_ar
 
-
+bud <- bud_post1
   
 ```
 
@@ -148,15 +148,25 @@ tabell2_2 %>%
     kable_styling( latex_options = c("HOLD_position","striped", "scale_down"), stripe_index =  c(1,3,5,7,9,11), font_size = 4 )  
 
 
+t3 <- bud$lagTabellMndUtviklingRegnskap() %>% ungroup()
+t3$mnd <- c(3,6,9,12)
+
+mnd3  <- dplyr::select( t3,mnd, paste0( "anslag_", year(bud$giPeriode() )) ) %>% filter( mnd == 3) %>% pull(paste0( "anslag_", year(bud$giPeriode() )))
+mnd12 <- dplyr::select( t3,mnd, paste0( "anslag_", year(bud$giPeriode() )) ) %>% filter( mnd == 12) %>% pull(paste0( "anslag_", year(bud$giPeriode() )))
+
+snitt <- dplyr::select( t3,mnd, paste0( "anslag_", year(bud$giPeriode() )) )  %>% pull(paste0( "anslag_", year(bud$giPeriode() ))) %>% mean()
+
+fra_3mnd <- (nytt_iar$giSumAnslag() - mnd3)
+fra_12mnd <- (nytt_iar$giSumAnslag() - mnd12)
+fra_snitt <- (nytt_iar$giSumAnslag() - snitt)
 ```
 
+Anslaget for `r bud$giPeriode() %>% year() ` er `r proset_endring_fra_ifjor` pst. fra utgiftene i `r (year(bud$giPeriode())-1)` i faste `r year(bud$giPeriode())`-kr-kroner<Det skyldes info fra dekomponering>. Sammenliknet med 3–12 månedersutviklingen (tabell 3) er anslaget `r  format(fra_3mnd/10^6, digits = 0, big.mark = " ")` mill. kr. fra 3-månedersutviklingen, og `r  format(fra_12mnd/10^6, digits = 0, big.mark = " ")` mill.kr. fra 12-månedersutviklingen. Gjennomsnittlig anslag, basert på 3- til 12-måndersutviklingen, er `r format(snitt/10^6, digits = 0, big.mark = ' ' )` mill. kroner, `r format(fra_snitt/10^6, big.mark = " ", digits = 0)` mill.kr fra nytt anslag for `r year(bud$giPeriode())`.
 
-Her kan man bruke informasjon fra tabellen over. Eks. regnskapstallene for året `r nytt_iar$giAr()-1`  er  `r tabell2$regnskap[tabell2$ar == "2020"] %>% format(digits = 1)`,
-som er `r abs(fra_i_fjor) %>% format(digits = 1)` mill. kroner `r fra_i_fjor_i_tekst`.
+
 
 
 Tabell 3: Regnskapstall basert på månedsutvikling, samme periode i fjor.
-
 ```{r , echo = F, warning=F, error=F}
 
 tabell3 %>% navR::latex_tabell( size = 5)
@@ -164,6 +174,7 @@ tabell3 %>% navR::latex_tabell( size = 5)
 ```
 
 
+\hspace{4cm}
 
 Tabell 4: Antall mottakere basert på månedsutvikling, samme periode i fjor.
 ```{r , echo = F, warning=F}
@@ -192,7 +203,7 @@ endre_tekst <- function( df) { df %>% mutate( tekst = case_when( str_detect(teks
                                                                  T ~ tekst)) }
 
 tabell_forutsetning <- tibble( anslag = list( regnskap_ifjor,
-                                              vedtatt_iar,
+                                              forrige_iar,
                                               nytt_iar) ) %>% 
     mutate( anslag_navn = map(anslag, ~str_c(.x$giAnslagNavn()," ",.x$giAr() ) ) ) %>% 
     mutate( anslag      = map(anslag, ~endre_tekst(.x$giDfAnslag() )),

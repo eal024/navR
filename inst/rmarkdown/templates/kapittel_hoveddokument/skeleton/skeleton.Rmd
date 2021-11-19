@@ -33,7 +33,7 @@ g_neste_ar <- 108287
 
 
 
-```{r child = c('post1.Rmd'), include= F}
+```{r child = c('post70.Rmd'), include= F}
 
 # Herfra peker hoveddokumentet på dokumentet som lager anslag for hver post. 
 
