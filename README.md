@@ -23,7 +23,7 @@ Et enkelt eksempel på hvordan bruke navR:
 
 ``` r
 tabell <- navR::RegnskapTabell$new(
-    dfRegnskap = navR::regnskap %>% filter(dato < ymd("2020-08-01")) %>% rename( pris = g),
+    dfRegnskap = navR::regnskap %>% filter(dato <= ymd("2020-08-01")) %>% rename( pris = g),
     pris_gjeldende = 100000,
     anslag_ar = 2020,
     anslag_mnd_periode = 08
@@ -93,7 +93,7 @@ Regnskap
 2016
 </td>
 <td style="text-align:right;">
-2295.4302
+2295.430
 </td>
 <td style="text-align:right;">
 -209.53035
@@ -105,10 +105,10 @@ Regnskap
 91740.00
 </td>
 <td style="text-align:right;">
-2502.1040
+2502.104
 </td>
 <td style="text-align:right;">
--296.6721
+-296.67207
 </td>
 <td style="text-align:right;">
 -0.1060006
@@ -122,7 +122,7 @@ Regnskap
 2017
 </td>
 <td style="text-align:right;">
-2055.7662
+2055.766
 </td>
 <td style="text-align:right;">
 -239.66400
@@ -134,10 +134,10 @@ Regnskap
 93281.33
 </td>
 <td style="text-align:right;">
-2203.8345
+2203.834
 </td>
 <td style="text-align:right;">
--298.2695
+-298.26950
 </td>
 <td style="text-align:right;">
 -0.1192075
@@ -151,7 +151,7 @@ Regnskap
 2018
 </td>
 <td style="text-align:right;">
-1826.7347
+1826.735
 </td>
 <td style="text-align:right;">
 -229.03149
@@ -163,10 +163,10 @@ Regnskap
 95800.00
 </td>
 <td style="text-align:right;">
-1906.8212
+1906.821
 </td>
 <td style="text-align:right;">
--297.0133
+-297.01329
 </td>
 <td style="text-align:right;">
 -0.1347711
@@ -180,7 +180,7 @@ Regnskap
 2019
 </td>
 <td style="text-align:right;">
-1709.0292
+1709.029
 </td>
 <td style="text-align:right;">
 -117.70549
@@ -192,10 +192,10 @@ Regnskap
 98866.33
 </td>
 <td style="text-align:right;">
-1728.6261
+1728.626
 </td>
 <td style="text-align:right;">
--178.1951
+-178.19513
 </td>
 <td style="text-align:right;">
 -0.0934514
@@ -209,7 +209,7 @@ Regnskap
 2019-08-31
 </td>
 <td style="text-align:right;">
-1146.9949
+1146.995
 </td>
 <td style="text-align:right;">
 -87.79218
@@ -221,10 +221,10 @@ Regnskap
 98370.50
 </td>
 <td style="text-align:right;">
-1165.9947
+1165.995
 </td>
 <td style="text-align:right;">
--130.2539
+-130.25392
 </td>
 <td style="text-align:right;">
 -0.1004853
@@ -238,25 +238,25 @@ Regnskap
 2020-08-31
 </td>
 <td style="text-align:right;">
-955.4292
+1086.601
 </td>
 <td style="text-align:right;">
--191.56570
+-60.39349
 </td>
 <td style="text-align:right;">
--0.1670153
+-0.0526537
 </td>
 <td style="text-align:right;">
 99858.00
 </td>
 <td style="text-align:right;">
-956.7878
+1088.147
 </td>
 <td style="text-align:right;">
--209.2069
+-77.84821
 </td>
 <td style="text-align:right;">
--0.1794236
+-0.0667655
 </td>
 </tr>
 </tbody>

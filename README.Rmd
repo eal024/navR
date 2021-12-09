@@ -46,7 +46,7 @@ library(lubridate)
 
 ```{r cars}
 tabell <- navR::RegnskapTabell$new(
-    dfRegnskap = navR::regnskap %>% filter(dato < ymd("2020-08-01")) %>% rename( pris = g),
+    dfRegnskap = navR::regnskap %>% filter(dato <= ymd("2020-08-01")) %>% rename( pris = g),
     pris_gjeldende = 100000,
     anslag_ar = 2020,
     anslag_mnd_periode = 08
