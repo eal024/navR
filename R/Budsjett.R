@@ -291,7 +291,7 @@ Budsjett <- R6::R6Class( "Budsjett",
 
                              # Print -------------------------------------------------------------------
                              print = function(...){
-                                 cat("Dette er budsjettet for ", kapittelpost  ,". Året er  ",private$ar,"og mnd  er", private$mnd, "\n")
+                                 cat("Dette er budsjettet for ", private$kapittelpost  ,". Året er  ",private$ar,"og mnd  er", private$mnd, "\n")
                                  cat("Anslaget er:", private$name," For ar: ", private$ar, "\n");
                                  #     cat("Regnskapet i fjor viser:", private$dfRegnskap[private$dfRegnskap$ar == (private$ar-1)], "\n")
                                  #     # cat("G er ", private$G, "\n")
