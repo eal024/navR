@@ -55,6 +55,9 @@ bud_post1 <- Budsjett$new(name = "Kap. 2020 Enslig mor eller far",
 
 
 
+
+
+
 ```
 
 

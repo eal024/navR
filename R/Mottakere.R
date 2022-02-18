@@ -10,7 +10,7 @@ Mottakere <- R6::R6Class( "mottakere",
                                 },
 
                                 # mottakertabell
-                                lagTabell = function(  ){
+                                lagTabell = function( ceiling_date = T ){
 
                                     filter_ar = ifelse( private$ANSLAG_MND_PERIODE == 12, private$ANSLAG_AR+1, private$ANSLAG_AR )
 
@@ -55,6 +55,13 @@ Mottakere <- R6::R6Class( "mottakere",
                                         filter( ar %in% c( (private$ANSLAG_AR-1)  ,private$ANSLAG_AR)) %>%
                                         mutate( ar = str_c(ar,"-",ifelse( private$ANSLAG_MND_PERIODE < 10, str_c("0",(private$ANSLAG_MND_PERIODE) ), (private$ANSLAG_MND_PERIODE) ),"-01") ) %>%
                                         drop_na()
+
+                                    # Hvis Ceiling date, endre til siste dag i mnd. Hvis ikke, lar det bli 1.dag i mnd.
+                                    if( ceiling_date == T){
+                                        tabell_mottakere_del2 <- tabell_mottakere_del2 %>% dplyr::mutate( ar = (lubridate::ceiling_date( ymd(ar), unit = "month") -1) %>% as.character()  )
+                                        }
+
+
 
 
                                     private$tabellMottakere <- bind_rows(tabell_mottakere_del1 %>% mutate(ar = as.character(ar)), tabell_mottakere_del2) %>%
