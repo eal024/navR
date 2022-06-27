@@ -134,6 +134,7 @@ Anslag <- R6::R6Class( "Anslag",
                                if( mill.kroner == T ) { return( private$DFAnslag %>% mutate( tall = tall/10^6) ) } else { return(private$DFAnslag) } },
 
                            # Endre forutsetninger
+                           # Forutsetning i prosenter
                            setVolum = function( volumvekst ) {
                                private$volumvekst = volumvekst
                                self$dfAnslag()
@@ -147,9 +148,20 @@ Anslag <- R6::R6Class( "Anslag",
                                private$prisvekst = prisvekst
                                self$dfAnslag()
                                },
-                           setTiltak = function( tiltak ) {
-                               private$tiltak = tiltak
+
+
+                           setTiltak = function( tiltak, ikroner = F ) {
+                               # Om input er i kroner
+                               if(ikroner){
+                                   # omgjør tiltaket til prosenter
+                                   private$tiltak <- tiltak/( private$regnskap_ifjor + volumvekst + vekst_ytelse +prisvekst + underregulering)
+                               }else{ private$tiltak = tiltak }
+
+                               # Set anslaget på nytt.
                                self$dfAnslag()
+
+
+
                                },
                            setUnderregulering = function( underregulering ) {
                                private$underregulering = underregulering
