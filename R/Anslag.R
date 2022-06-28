@@ -77,11 +77,11 @@ Anslag <- R6::R6Class( "Anslag",
                            dfAnslag = function(  ){
 
                                # Forutsetninger i tall.
-                               volumvekst       <- private$regnskap_ifjor        *( private$volumvekst-1);
-                               vekst_ytelse     <- (private$vekst_ytelse-1)      *( private$regnskap_ifjor + volumvekst )
-                               prisvekst        <- (private$prisvekst-1)         *( private$regnskap_ifjor + volumvekst + vekst_ytelse )
-                               underregulering  <- (private$underregulering-1)   *( private$regnskap_ifjor + volumvekst + vekst_ytelse + prisvekst)
-                               tiltak           <- (private$tiltak -1)           *( private$regnskap_ifjor + volumvekst + vekst_ytelse +prisvekst + underregulering)
+                               volumvekst          <- private$regnskap_ifjor        *( private$volumvekst-1);
+                               vekst_ytelse        <- (private$vekst_ytelse-1)      *( private$regnskap_ifjor + volumvekst )
+                               prisvekst           <- (private$prisvekst-1)         *( private$regnskap_ifjor + volumvekst + vekst_ytelse )
+                               underregulering     <- (private$underregulering-1)   *( private$regnskap_ifjor + volumvekst + vekst_ytelse + prisvekst)
+                               tiltak              <- (private$tiltak -1)           *( private$regnskap_ifjor + volumvekst + vekst_ytelse +prisvekst + underregulering)
                                # Her er det ulik praksis. Se 667
                                prisvekst        <- (private$prisvekst-1)         *( private$regnskap_ifjor + volumvekst + vekst_ytelse + tiltak)
 
@@ -151,17 +151,17 @@ Anslag <- R6::R6Class( "Anslag",
 
 
                            setTiltak = function( tiltak, ikroner = F ) {
-                               # Om input er i kroner
+                               private$tiltak = 1
+                               self$dfAnslag()
+                               # # Om input er i kroner
                                if(ikroner){
-                                   # omgjør tiltaket til prosenter
-                                   private$tiltak <- tiltak/( private$regnskap_ifjor + volumvekst + vekst_ytelse +prisvekst + underregulering)
-                               }else{ private$tiltak = tiltak }
-
+                                   pst_tiltak      = ((self$giSumAnslag() + tiltak)/(self$giSumAnslag())-1)
+                                   private$tiltak  = 1+ pst_tiltak
+                               }else{
+                                   private$tiltak = tiltak
+                               }
                                # Set anslaget på nytt.
                                self$dfAnslag()
-
-
-
                                },
                            setUnderregulering = function( underregulering ) {
                                private$underregulering = underregulering
@@ -224,8 +224,9 @@ Anslag <- R6::R6Class( "Anslag",
 
                            # 1+0,0v
                            volumvekst = NULL,
-                           # Prosent
-                           tiltak = NULL,
+                           # Tiltak
+                           tiltak = NULL,     # I pst
+                           tiltak_sum = NULL, # I kroner
                            # Underregulering av prisveksten
                            underregulering = NULL,
                            # Anslaget

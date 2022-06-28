@@ -1,4 +1,7 @@
 
+# Oppskrift
+ - Hvordan legge til nytt template:
+
 
 Forbedringer til programmet:
 
@@ -17,6 +20,7 @@ X. Metadata
 
 1. Anslag
     - Funksjon som tar inn antall mottakere
+    v legge inn tiltak i mill.kroner
 
 
 1.1 Mottakertabell
@@ -53,3 +57,16 @@ X. Metadata
 
 6. Diverse
     v Egen funksjon som endrer month() til navn
+
+
+
+
+
+
+
+
+
+
+
+
+
